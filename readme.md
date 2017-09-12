@@ -1,0 +1,67 @@
+## TAXII2 client library in javascript
+
+**Taxii2Lib.js** is a [Javascript (ES6)](https://developer.mozilla.org/en-US/docs/Web/JavaScript) library that 
+provides a set of classes and methods for building Javascript clients to [TAXII 2.0](https://oasis-open.github.io/cti-documentation/)  servers.
+
+[[1]](https://oasis-open.github.io/cti-documentation/) 
+Trusted Automated Exchange of Intelligence Information (TAXII) is an application layer protocol 
+used to exchange cyber threat intelligence (CTI) over HTTPS. 
+TAXII enables organizations to share CTI by defining an API that aligns with common sharing models.
+[TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/) defines the TAXII RESTful API and its resources along with the requirements for TAXII Client and Server implementations. 
+
+**Taxii2Lib.js** uses [asynchronous requests](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) 
+to fetch TAXII 2.0 server resources. It has five classes, namely:
+
+- *TaxiiConnect*, providing the async communications to the server.
+- *Server*, endpoint for retrieving the discovery and api roots resources.
+- *Collections*, endpoint for retrieving the list of collection resources. 
+- *Collection*, endpoint for retrieving a collection resource and associated objects. 
+- *Status*, endpoint for retrieving a status resources. 
+ 
+### References
+ 
+1) [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/)
+ 
+ 
+### Installation  
+
+
+### Usage
+
+The following TAXII 2.0 API services are supported with the corresponding async methods:
+
+- Server Discovery --> server.discovery()
+- Get API Root Information --> server.api_roots()
+- Get Collections --> collections.get() and collections.get(i)
+- Get a Collection --> collection.get()
+- Get Objects --> collection.getObjects()
+- Add Objects --> collection.addObject(bundle)
+- Get an Object --> collection.getObject(obj_id)
+- Get Object Manifests --> collection.getManifest() and collection.getManifest(obj_id)
+- Get Status --> todo
+
+For example:
+
+    // create the communication instance
+    const conn = new TaxiiConnect("http://example.com:3210", "user-me", "my-password");
+    // create a server endpoint
+    const server = new Server("/taxii/", conn);
+    // fetch the discovery info from the server 
+    server.discovery().then(discovery => {
+        console.log("----> Server discovery \n" + JSON.stringify(discovery));
+    });
+    // fetch the api roots info from the server
+    server.api_roots().then(apiroots => {
+        console.log("----> Server apiroots \n" + JSON.stringify(apiroots));
+        apiroots.map(apiroot => {
+            console.log("----> Server apiroots apiroot \n" + JSON.stringify(apiroot));
+        });
+    });
+
+See the [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/) for the list 
+of attributes of the TAXII 2.0 server responses.
+
+
+### Status
+experimental, not yet finished, not tested, not ready.
+Waiting for a TAXII2 server to connect to.
