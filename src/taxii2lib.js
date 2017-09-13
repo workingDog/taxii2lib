@@ -333,7 +333,7 @@ class Collection {
 
     /**
      * adds a STIX2 bundle to this Collection objects.
-     * returns a Taxii2 status object
+     * returns a Taxii2 Status object
      */
     async addObject(bundle) {
         return this.ifCanWrite(this.conn.asyncFetch(this.path + "/objects", this.conn.postConfig));
@@ -359,6 +359,42 @@ class Collection {
         }
     }
 
-}
+/**
+ * This Endpoint provides information about the status of a previous request.
+ * In TAXII 2.0, the only request that can be monitored is one to add objects to a Collection.
+ */
+class Status {
+
+    /**
+     * provides information about the status of a previous request.
+     * @param {type} api_root_path - the full path to the desired api root
+     * @param {type} status_id - the identifier of the status message being requested, for STIX objects, their id.
+     * @param {type} conn - a TaxiiConnection class instance.
+     */
+    constructor(api_root_path, status_id, conn) {
+        this.api_root_path = TaxiiConnect.withLastSlash(api_root_path);
+        this.conn = conn;
+        this.path = this.api_root_path + "status/" + status_id + "/";
+        // cache represents the cached results and flag determines if it needs a re-fetch
+        this.options = {"cache": {}, "flag": false};
+    }
+
+    /**
+     * reset the options flags so that a server request will be required
+     * to get the results, rather than from cache.
+     */
+    invalidate() {
+        this.options.flag = false;
+    }
+
+   /**
+    * retrieves the Status information about a request to add objects to a Collection.
+    */
+    async get() {
+      return this.conn.fetchThis(this.path, this.options);
+    }
+
+ }
+
 
     
