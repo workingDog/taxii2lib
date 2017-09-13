@@ -22,9 +22,6 @@ to fetch TAXII 2.0 server resources. It has five classes, namely:
  
 1) [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/)
  
- 
-### Installation  
-
 
 ### Usage
 
@@ -64,4 +61,4 @@ of attributes of the TAXII 2.0 server responses.
 
 ### Status
 experimental, not yet finished, not tested, not ready.
-Waiting for a TAXII2 server to connect to.
+Waiting for a TAXII 2.0 server to connect to.
