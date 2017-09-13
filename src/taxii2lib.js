@@ -95,7 +95,7 @@ class TaxiiConnect {
 }
 
 /*
- * a TAXII Server encapsulates a discovery and api roots endpoints.
+ * Server encapsulates a discovery and api roots endpoints.
  */
 class Server {
 
@@ -185,7 +185,8 @@ class Server {
 }
 
 /*
- * A TAXII Collections is an interface to a logical repository of CTI objects 
+ * Collections resource endpoint.
+ * A TAXII Collections is an interface to a logical repository of CTI objects
  * provided by a TAXII Server and is used by TAXII Clients to send information 
  * to the TAXII Server or request information from the TAXII Server.
  * A TAXII Server can host multiple Collections per API Root, and Collections 
