@@ -79,7 +79,7 @@ class TaxiiConnect {
     static withoutLastSlash(aUrl) {
         let theUrl = aUrl;
         if (aUrl.substr(-1) === '/') {
-            theUrl = aUrl.substr(0, aUrl.length-1);
+            theUrl = aUrl.substr(0, aUrl.length - 1);
         }
         return theUrl;
     }
@@ -88,7 +88,7 @@ class TaxiiConnect {
     static withLastSlash(aUrl) {
         let theUrl = aUrl;
         if (aUrl.substr(-1) !== '/') {
-           theUrl = aUrl + "/";
+            theUrl = aUrl + "/";
         }
         return theUrl;
     }
@@ -225,22 +225,22 @@ class Collections {
      * @returns {Array|Collections@call;collections@call;then}
      */
     async get(index) {
-        if (index === undefined) {
-           // return a list of collection info
-           await this.conn.fetchThis(this.api_root_path + "collections/", this.options);
-           return this.options.cache.collections;
+        if (typeof index === "undefined") {
+            // return a list of collection info
+            await this.conn.fetchThis(this.api_root_path + "collections/", this.options);
+            return this.options.cache.collections;
         } else {
-        if (Number.isInteger(index)) {
-        // return a specific collection info
-        if (!this.collectionsFlag) {
-            return this.get().then(cols => {
-                return this.options.cache.collections[index];
-            });
-        } else {
-            return this.options.cache.collections[index];
+            if (Number.isInteger(index)) {
+                // return a specific collection info
+                if (!this.collectionsFlag) {
+                    return this.get().then(cols => {
+                        return this.options.cache.collections[index];
+                    });
+                } else {
+                    return this.options.cache.collections[index];
+                }
+            }
         }
-       }
-      }
     }
 
 }
@@ -283,6 +283,7 @@ class Collection {
     /**
      * check that the collection allows reading, if true then return the function passed in
      * else log an error
+     * @param {func} - the function to return 
      */
     ifCanRead(func) {
         if (this.collectionInfo.can_read) {
@@ -295,6 +296,7 @@ class Collection {
     /**
      * check that the collection allows writing, if true then return the function passed in
      * else log an error
+     * @param {func} - the function to return 
      */
     ifCanWrite(func) {
         if (this.collectionInfo.can_write) {
@@ -345,16 +347,16 @@ class Collection {
      * returns specific manifest-entry
      */
     async getManifest(obj_id) {
-         if (obj_id === undefined) {
-             // return the list of manifest-entry
-             this.ifCanRead(await this.conn.fetchThis(this.path + "/manifest", this.manOptions));
-             return this.manOptions.cache.objects;
-         } else {
-             // return the specified manifest-entry object
-             return await (this.getManifest().then(objects => {
-                 return objects.find(obj => obj.id === obj_id);
-             }));
-         }
+        if (typeof obj_id === "undefined") {
+            // return the list of manifest-entry
+            this.ifCanRead(await this.conn.fetchThis(this.path + "/manifest", this.manOptions));
+            return this.manOptions.cache.objects;
+        } else {
+            // return the specified manifest-entry object
+            return await (this.getManifest().then(objects => {
+                return objects.find(obj => obj.id === obj_id);
+            }));
+        }
     }
 
 }

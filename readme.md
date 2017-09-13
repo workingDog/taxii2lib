@@ -1,6 +1,6 @@
 ## TAXII 2.0 client library in javascript
 
-**taxii2lib.js** is a [Javascript (ES6)](https://developer.mozilla.org/en-US/docs/Web/JavaScript) library that 
+**taxii2lib.js** is a [Javascript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) library that 
 provides a set of classes and methods for building Javascript clients to [TAXII 2.0](https://oasis-open.github.io/cti-documentation/)  servers.
 
 [[1]](https://oasis-open.github.io/cti-documentation/) 
