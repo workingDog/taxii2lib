@@ -1,5 +1,5 @@
 
-/* 
+/**
  * TAXII 2.0 Javascript client library.
  * 
  * reference: https://oasis-open.github.io/cti-documentation/
@@ -14,11 +14,11 @@
  */
 class TaxiiConnect {
 
-    /*
+    /**
      * For connecting to a Taxii2 server.
-     * @param {type} url the base url of the Taxii2 server, e.g. https://example.com/
-     * @param {type} user the user name required for authentication.
-     * @param {type} password the user password required for authentication.
+     * @param {type} url - the base url of the Taxii2 server, e.g. https://example.com/
+     * @param {type} user - the user name required for authentication.
+     * @param {type} password - the user password required for authentication.
      * @returns {TaxiiConnect} 
      */
     constructor(url, user, password) {
@@ -44,11 +44,11 @@ class TaxiiConnect {
         };
     }
 
-    /*
+    /**
      * send an async request (get or post) to the taxii2 server.
-     * @param {type} fullPath the full path to connect to.
-     * @param {type} config the request configuration, see getConfig and postConfig
-     * @returns {unresolved} the promise response result in json.
+     * @param {type} fullPath - the full path to connect to.
+     * @param {type} config - the request configuration, see getConfig and postConfig
+     * @returns {unresolved} - the promise response result in json.
      */
     async asyncFetch(fullPath, config) {
         let results = await (await (fetch(fullPath, config).then(res => {
@@ -59,10 +59,10 @@ class TaxiiConnect {
         return results;
     }
 
-    /*
+    /**
      * send a get async request to the taxii2 server.
-     * @param {type} fullPath the full path to connect to.
-     * @param {type} options an option object of the form: { "cache": {}, "flag": false }
+     * @param {type} fullPath - the full path to connect to.
+     * @param {type} options - an option object of the form: { "cache": {}, "flag": false }
      * @returns {unresolved}
      */
     async fetchThis(fullPath, options) {
@@ -94,15 +94,15 @@ class TaxiiConnect {
     }
 }
 
-/*
+/**
  * Server encapsulates a discovery and api roots endpoints.
  */
 class Server {
 
-    /*
+    /**
      * a TAXII Server endpoint representation.
-     * @param {type} path the path to the server to retrieve the discovery endpoint, e.g. "/taxii/"
-     * @param {type} conn a TaxiiConnection class instance.
+     * @param {type} path - the path to the server to retrieve the discovery endpoint, e.g. "/taxii/"
+     * @param {type} conn - a TaxiiConnection class instance.
      */
     constructor(path, conn) {
         this.path = TaxiiConnect.withLastSlash(path);
@@ -114,8 +114,8 @@ class Server {
 
     /**
      * determine if the obj is empty, {}
-     * @param {type} obj the object to test
-     * @returns {Boolean} true if empty else false
+     * @param {type} obj - the object to test
+     * @returns {Boolean} - true if empty else false
      */
     static isEmpty(obj) {
         return Object.keys(obj).length === 0 && obj.constructor === Object;
@@ -130,7 +130,7 @@ class Server {
         this.apiOptions.flag = false;
     }
 
-    /*
+    /**
      * to obtain information about a TAXII Server and get a list of API Roots. 
      * @returns {unresolved}
      */
@@ -138,7 +138,7 @@ class Server {
         return this.conn.fetchThis(this.conn.baseURL + this.path, this.disOptions);
     }
 
-    /*
+    /**
      * API Roots are logical groupings of TAXII Channels, Collections, and related functionality.
      * Each API Root contains a set of Endpoints that a TAXII Client contacts in order to interact with the TAXII Server.
      * This returns the api roots information objects, not the string url.
@@ -150,9 +150,9 @@ class Server {
         });
     }
 
-    /*
+    /**
      * private function to retrieve the api roots
-     * @param {type} discovery object
+     * @param {type} discovery - discovery object
      * @returns {Array} of api root objects
      */
     async _getApiRoots(discovery) {
@@ -184,7 +184,7 @@ class Server {
 
 }
 
-/*
+/**
  * Collections resource endpoint.
  * A TAXII Collections is an interface to a logical repository of CTI objects
  * provided by a TAXII Server and is used by TAXII Clients to send information 
@@ -194,11 +194,11 @@ class Server {
  */
 class Collections {
 
-    /*
+    /**
      * A TAXII Collections for a specific api root endpoint.
      * The collections resource is a simple wrapper around a list of collection resources.
-     * @param {type} api_root_path the full path to the desired api root
-     * @param {type} conn a TaxiiConnection class instance.
+     * @param {type} api_root_path - the full path to the desired api root
+     * @param {type} conn - a TaxiiConnection class instance.
      */
     constructor(api_root_path, conn) {
         this.api_root_path = TaxiiConnect.withLastSlash(api_root_path);
@@ -215,13 +215,13 @@ class Collections {
         this.options.flag = false;
     }
 
-    /*
+    /**
      * provides information about the Collections hosted under this API Root.
      * @returns {Array} a list of collection info if there "index" is undefined.
      *
      * access a specific collection given an index into the collections array.
      *
-     * @param {type} index of the desired collection or undefined
+     * @param {type} index - of the desired collection or undefined
      * @returns {Array|Collections@call;collections@call;then}
      */
     async get(index) {
@@ -245,16 +245,16 @@ class Collections {
 
 }
 
-/*
+/**
  * A Collection resource endpoint.
  */
 class Collection {
 
-    /*
+    /**
      * Collection resource endpoint.
-     * @param {type} collectionInfo the collection resource info of this endpoint.
-     * @param {type} api_root_path the full path to the desired api root
-     * @param {type} conn a TaxiiConnection class instance.
+     * @param {type} collectionInfo - the collection resource info of this endpoint.
+     * @param {type} api_root_path - the full path to the desired api root
+     * @param {type} conn - a TaxiiConnection class instance.
      */
     constructor(collectionInfo, api_root_path, conn) {
         this.collectionInfo = collectionInfo;
@@ -269,7 +269,7 @@ class Collection {
         this.manOptions = {"cache": {}, "flag": false};
     }
 
-    /*
+    /**
      * reset the options flags so that a server request will be required 
      * to get the desired results, rather than from cache.
      */
@@ -280,7 +280,7 @@ class Collection {
         this.manOptions.flag = false;
     }
 
-    /*
+    /**
      * check that the collection allows reading, if true then return the function passed in
      * else log an error
      */
@@ -292,7 +292,7 @@ class Collection {
         }
     }
 
-    /*
+    /**
      * check that the collection allows writing, if true then return the function passed in
      * else log an error
      */
@@ -304,21 +304,21 @@ class Collection {
         }
     }
 
-    /*
+    /**
      * retrieves the Collection.
      */
     async get() {
         return this.ifCanRead(this.conn.fetchThis(this.path, this.colOptions));
     }
 
-    /*
+    /**
      * retrieves STIX2 bundle from this Collection.
      */
     async getObjects() {
         return this.ifCanRead(this.conn.fetchThis(this.path + "/objects", this.objsOptions));
     }
 
-    /*
+    /**
      * returns a specific STIX2 object from this Collection objects bundle.
      * obj_id must be a STIX object id.
      */
@@ -329,7 +329,7 @@ class Collection {
         return result;
     }
 
-    /*
+    /**
      * adds a STIX2 bundle to this Collection objects.
      * returns a Taxii2 status object
      */
@@ -337,7 +337,7 @@ class Collection {
         return this.ifCanWrite(this.conn.asyncFetch(this.path + "/objects", this.conn.postConfig));
     }
 
-    /*
+    /**
      * retrieves a manifest about objects from this Collection
      * returns objects, the list of manifest-entry if obj_id is undefined
      * or
@@ -346,9 +346,11 @@ class Collection {
      */
     async getManifest(obj_id) {
          if (obj_id === undefined) {
+             // return the list of manifest-entry
              this.ifCanRead(await this.conn.fetchThis(this.path + "/manifest", this.manOptions));
              return this.manOptions.cache.objects;
          } else {
+             // return the specified manifest-entry object
              return await (this.getManifest().then(objects => {
                  return objects.find(obj => obj.id === obj_id);
              }));
