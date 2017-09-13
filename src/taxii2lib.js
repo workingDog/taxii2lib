@@ -1,6 +1,6 @@
 
 /* 
- * TAXII 2.0 client library.
+ * TAXII 2.0 Javascript client library.
  * 
  * reference: https://oasis-open.github.io/cti-documentation/
  * 

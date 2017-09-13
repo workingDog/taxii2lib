@@ -1,6 +1,6 @@
 ## TAXII 2.0 client library in javascript
 
-**Taxii2Lib.js** is a [Javascript (ES6)](https://developer.mozilla.org/en-US/docs/Web/JavaScript) library that 
+**taxii2lib.js** is a [Javascript (ES6)](https://developer.mozilla.org/en-US/docs/Web/JavaScript) library that 
 provides a set of classes and methods for building Javascript clients to [TAXII 2.0](https://oasis-open.github.io/cti-documentation/)  servers.
 
 [[1]](https://oasis-open.github.io/cti-documentation/) 
@@ -9,7 +9,7 @@ used to exchange cyber threat intelligence (CTI) over HTTPS.
 TAXII enables organizations to share CTI by defining an API that aligns with common sharing models.
 [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/) defines the TAXII RESTful API and its resources along with the requirements for TAXII Client and Server implementations. 
 
-**Taxii2Lib.js** uses [asynchronous requests](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) 
+**taxii2lib.js** uses [asynchronous requests](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) 
 to fetch TAXII 2.0 server resources. It has five classes, namely:
 
 - *TaxiiConnect*, providing the async communications to the server.
