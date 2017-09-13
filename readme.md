@@ -1,4 +1,4 @@
-## TAXII2 client library in javascript
+## TAXII 2.0 client library in javascript
 
 **Taxii2Lib.js** is a [Javascript (ES6)](https://developer.mozilla.org/en-US/docs/Web/JavaScript) library that 
 provides a set of classes and methods for building Javascript clients to [TAXII 2.0](https://oasis-open.github.io/cti-documentation/)  servers.
@@ -28,7 +28,7 @@ to fetch TAXII 2.0 server resources. It has five classes, namely:
 
 ### Usage
 
-The following TAXII 2.0 API services are supported with the corresponding async methods:
+The following TAXII 2.0 API services are supported with these corresponding async methods:
 
 - Server Discovery --> server.discovery()
 - Get API Root Information --> server.api_roots()
@@ -40,7 +40,7 @@ The following TAXII 2.0 API services are supported with the corresponding async 
 - Get Object Manifests --> collection.getManifest() and collection.getManifest(obj_id)
 - Get Status --> todo
 
-For example:
+Example:
 
     // create the communication instance
     const conn = new TaxiiConnect("http://example.com:3210", "user-me", "my-password");

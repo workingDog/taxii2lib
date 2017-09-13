@@ -1,6 +1,6 @@
 
 /* 
- * Taxii2 client library.
+ * TAXII 2.0 client library.
  * 
  * reference: https://oasis-open.github.io/cti-documentation/
  * 
@@ -10,7 +10,7 @@
 
 "use strict";
 /* 
- * Provide for connecting to a Taxii2 server using asynchronous communication.
+ * Provide for connecting to a TAXII 2.0 server using asynchronous communication.
  */
 class TaxiiConnect {
 
