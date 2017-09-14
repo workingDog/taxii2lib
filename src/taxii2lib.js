@@ -358,6 +358,7 @@ class Collection {
             }));
         }
     }
+}
 
 /**
  * This Endpoint provides information about the status of a previous request.
@@ -373,28 +374,20 @@ class Status {
      */
     constructor(api_root_path, status_id, conn) {
         this.api_root_path = TaxiiConnect.withLastSlash(api_root_path);
+        this.status_id = status_id;
         this.conn = conn;
         this.path = this.api_root_path + "status/" + status_id + "/";
-        // cache represents the cached results and flag determines if it needs a re-fetch
-        this.options = {"cache": {}, "flag": false};
-    }
-
-    /**
-     * reset the options flags so that a server request will be required
-     * to get the results, rather than from cache.
-     */
-    invalidate() {
-        this.options.flag = false;
     }
 
    /**
     * retrieves the Status information about a request to add objects to a Collection.
     */
     async get() {
-      return this.conn.fetchThis(this.path, this.options);
+      try {
+          return this.conn.asyncFetch(this.path, this.conn.getConfig);
+      } catch (err) {
+          console.log("----> Status could not be fetched from: " + this.path);
+      }
     }
 
  }
-
-
-    

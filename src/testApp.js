@@ -18,6 +18,7 @@ const testCollectionInfo = {
     "can_write": false,
     "media_types": ["application/vnd.oasis.stix+json; version=2.0"]
 };
+
 // ----------------------------------------------------------------------------------------
 
 // the url should be without the last slash, if present the url will be used without it internally.
@@ -100,5 +101,11 @@ theCollections.get(0).then(collection => {
 });
 
 // ----------------------------------------------------------------------------------------
+
+const theStatus = new Status("https://example.com/api1", "2d086da7-4bdc-4f91-900e-d77486753710", conn);
+
+theStatus.get().then(status => {
+    console.log("----> theStatus.get() \n" + JSON.stringify(status));
+});
 
 // ----------------------------------------------------------------------------------------
