@@ -10,7 +10,7 @@ TAXII enables organizations to share CTI by defining an API that aligns with com
 [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/) defines the TAXII RESTful API and its resources along with the requirements for TAXII Client and Server implementations. 
 
 The aim of this library is to assist creating TAXII 2.0 clients in Javascript, using 
-for example frameworks such as bootstrap and react. 
+for example frameworks such as [bootstrap](http://getbootstrap.com/) and [react](https://facebook.github.io/react/). 
 
 
 **taxii2lib.js** uses [asynchronous requests](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) 
