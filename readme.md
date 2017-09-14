@@ -44,7 +44,7 @@ The following TAXII 2.0 API services are supported with these corresponding asyn
 Example:
 
     // create the communication instance
-    const conn = new TaxiiConnect("http://example.com:3210", "user-me", "my-password");
+    const conn = new TaxiiConnect("https://example.com:3210", "user-me", "my-password");
     // create a server endpoint
     const server = new Server("/taxii/", conn);
     // fetch the discovery info from the server 
