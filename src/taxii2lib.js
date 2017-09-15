@@ -28,9 +28,7 @@ class TaxiiConnect {
 
         this.headers = new Headers({
             'Accept': 'application/vnd.oasis.taxii+json',
-            'version': '2.0',
-            'Content-Type': 'application/vnd.oasis.taxii+json',
-            'Authorization': 'Basic ' + btoa(this.user + ":" + this.password)
+            'version': '2.0'
         });
 
         this.getConfig = {
@@ -164,7 +162,7 @@ class Server {
                 try {
                     return this.conn.asyncFetch(url, this.conn.getConfig);
                 } catch (err) {
-                    console.log("----> Server could not fetch api_root url: " + url);
+                    console.log("----> in Server could not fetch api_root url: " + url);
                 }
             });
             // add the promises results to the array
@@ -261,7 +259,7 @@ class Collection {
         this.api_root_path = TaxiiConnect.withLastSlash(api_root_path);
         this.conn = conn;
         // construct the path
-        this.path = this.api_root_path + "collections/" + collectionInfo.id;
+        this.path = this.api_root_path + "collections/" + collectionInfo.id + "/";
         // cache represents the cached results and flag determines if it needs a re-fetch 
         this.colOptions = {"cache": {}, "flag": false};
         this.objsOptions = {"cache": {}, "flag": false};
@@ -317,7 +315,7 @@ class Collection {
      * retrieves STIX2 bundle from this Collection.
      */
     async getObjects() {
-        return this.ifCanRead(this.conn.fetchThis(this.path + "/objects", this.objsOptions));
+        return this.ifCanRead(this.conn.fetchThis(this.path + "/objects/", this.objsOptions));
     }
 
     /**
@@ -325,7 +323,7 @@ class Collection {
      * obj_id must be a STIX object id.
      */
     async getObject(obj_id) {
-        let result = await (await (this.ifCanRead(this.conn.fetchThis(this.path + "/objects/" + obj_id, this.objOptions).then(bundle => {
+        let result = await (await (this.ifCanRead(this.conn.fetchThis(this.path + "/objects/" + obj_id + "/", this.objOptions).then(bundle => {
             return bundle.objects.find(obj => obj.id === obj_id);
         }))));
         return result;
@@ -336,7 +334,7 @@ class Collection {
      * returns a Taxii2 Status object
      */
     async addObject(bundle) {
-        return this.ifCanWrite(this.conn.asyncFetch(this.path + "/objects", this.conn.postConfig));
+        return this.ifCanWrite(this.conn.asyncFetch(this.path + "/objects/", this.conn.postConfig));
     }
 
     /**
@@ -349,7 +347,7 @@ class Collection {
     async getManifest(obj_id) {
         if (typeof obj_id === "undefined") {
             // return the list of manifest-entry
-            this.ifCanRead(await this.conn.fetchThis(this.path + "/manifest", this.manOptions));
+            this.ifCanRead(await this.conn.fetchThis(this.path + "/manifest/", this.manOptions));
             return this.manOptions.cache.objects;
         } else {
             // return the specified manifest-entry object
