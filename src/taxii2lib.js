@@ -8,11 +8,10 @@
  * Version: 0.1
  */
 
-"use strict";
 /* 
  * Provide for connecting to a TAXII 2.0 server using asynchronous communication.
  */
-class TaxiiConnect {
+export class TaxiiConnect {
 
     /**
      * For connecting to a Taxii2 server.
@@ -95,7 +94,7 @@ class TaxiiConnect {
 /**
  * Server encapsulates a discovery and api roots endpoints.
  */
-class Server {
+export class Server {
 
     /**
      * a TAXII Server endpoint representation.
@@ -190,7 +189,7 @@ class Server {
  * A TAXII Server can host multiple Collections per API Root, and Collections 
  * are used to exchange information in a request–response manner. 
  */
-class Collections {
+export class Collections {
 
     /**
      * A TAXII Collections for a specific api root endpoint.
@@ -228,15 +227,25 @@ class Collections {
             await this.conn.fetchThis(this.api_root_path + "collections/", this.options);
             return this.options.cache.collections;
         } else {
-            if (Number.isInteger(index)) {
+            if (Number.isInteger(index) && index >= 0) {
                 // return a specific collection info
                 if (!this.collectionsFlag) {
                     return this.get().then(cols => {
-                        return this.options.cache.collections[index];
+                        if (index < this.options.cache.collections.length) {
+                            return this.options.cache.collections[index];
+                        } else {
+                            console.log("----> in Collections get(index) invalid index value: " + index);
+                        }
                     });
                 } else {
-                    return this.options.cache.collections[index];
+                    if (index < this.options.cache.collections.length) {
+                        return this.options.cache.collections[index];
+                    } else {
+                        console.log("----> in Collections get(index) invalid index value: " + index);
+                    }
                 }
+            } else {
+                console.log("----> in Collections get(index) invalid index value: " + index);
             }
         }
     }
@@ -246,7 +255,7 @@ class Collections {
 /**
  * A Collection resource endpoint.
  */
-class Collection {
+export class Collection {
 
     /**
      * Collection resource endpoint.
@@ -362,7 +371,7 @@ class Collection {
  * This Endpoint provides information about the status of a previous request.
  * In TAXII 2.0, the only request that can be monitored is one to add objects to a Collection.
  */
-class Status {
+export class Status {
 
     /**
      * provides information about the status of a previous request.
@@ -377,15 +386,15 @@ class Status {
         this.path = this.api_root_path + "status/" + status_id + "/";
     }
 
-   /**
-    * retrieves the Status information about a request to add objects to a Collection.
-    */
+    /**
+     * retrieves the Status information about a request to add objects to a Collection.
+     */
     async get() {
-      try {
-          return this.conn.asyncFetch(this.path, this.conn.getConfig);
-      } catch (err) {
-          console.log("----> Status could not be fetched from: " + this.path);
-      }
+        try {
+            return this.conn.asyncFetch(this.path, this.conn.getConfig);
+        } catch (err) {
+            console.log("----> Status could not be fetched from: " + this.path);
+        }
     }
 
- }
+}

@@ -1,5 +1,5 @@
 
-"use strict";
+import {TaxiiConnect, Server, Collections, Collection, Status} from './taxii2lib.js';
 
 console.log("---> in testApp.js <---");
 
@@ -28,6 +28,7 @@ const conn = new TaxiiConnect("https://test.freetaxii.com:8000", "user-me", "use
 // make sure the path starts and ends with a "/"
 const server = new Server("/taxii/", conn);
 
+
 server.discovery().then(discovery => {
     console.log("----> Server discovery \n" + JSON.stringify(discovery));
 
@@ -43,6 +44,13 @@ server.discovery().then(discovery => {
          theCollection.get().then(info => {
             console.log("----> Server theCollection.get() \n" + JSON.stringify(info));
          });
+    });
+
+    server.api_roots().then(apiroots => {
+        console.log("----> Server apiroots \n" + JSON.stringify(apiroots));
+        apiroots.map(apiroot => {
+            console.log("----> Server apiroots apiroot \n" + JSON.stringify(apiroot));
+        });
     });
 
 });
@@ -66,7 +74,7 @@ theCollection.getObjects().then(bundle => {
     console.log("----> theCollection.getObjects() \n" + JSON.stringify(bundle));
 });
 
-theCollection.getObject("indicator--47f01c55-9366-4342-af07-e880111abb66").then(stix => {
+theCollection.getObject("indicator--09303e92-608b-4b19-b453-109b170f17d3").then(stix => {
     console.log("----> theCollection.getObject(id) \n" + JSON.stringify(stix));
 });
 
@@ -87,7 +95,7 @@ theCollection.getObject("indicator--47f01c55-9366-4342-af07-e880111abb66").then(
 //});
 
 // ----------------------------------------------------------------------------------------
-//
+
 const theCollections = new Collections("https://test.freetaxii.com:8000/api1/", conn);
 
 theCollections.get().then(collections => {
@@ -111,3 +119,4 @@ theCollections.get(0).then(collection => {
 //});
 
 // ----------------------------------------------------------------------------------------
+
