@@ -25,19 +25,14 @@ export class TaxiiConnect {
         this.user = user;
         this.password = password;
 
-        this.headers = new Headers({
-            'Accept': 'application/vnd.oasis.taxii+json',
-            'version': '2.0'
-        });
-
         this.getConfig = {
             'method': 'get',
-            'headers': this.headers
+            'headers': {'Accept': 'application/vnd.oasis.taxii+json', 'version': '2.0'}
         };
 
         this.postConfig = {
             'method': 'post',
-            'headers': this.headers
+            'headers': {'Accept': 'application/vnd.oasis.taxii+json', 'version': '2.0'}
         };
     }
 
@@ -58,6 +53,13 @@ export class TaxiiConnect {
 
     /**
      * send a get async request to the taxii2 server.
+     *
+     * The response is passed to the cache of the options, and
+     * the options flag is set to true if a server request was performed.
+     * Otherwise if the options.flag is true, the cached response (options.cache) is returned and
+     * no server request is performed.
+     * To force a server request used invalidate first, e.g server.invalidate()
+     *
      * @param {type} fullPath - the full path to connect to.
      * @param {type} options - an option object of the form: { "cache": {}, "flag": false }
      * @returns {unresolved}
@@ -168,7 +170,7 @@ export class Server {
             for (const aPromise of allPromises) {
                 this.apiOptions.cache.push(await aPromise);
             }
-            // remove the undefined and empty elements
+            // remove the undefined and empty elements, i.e. those we could not connect to.
             this.apiOptions.cache = this.apiOptions.cache.filter(element => {
                 return (element !== undefined && !Server.isEmpty(element));
             });
@@ -214,11 +216,11 @@ export class Collections {
 
     /**
      * provides information about the Collections hosted under this API Root.
-     * @returns {Array} a list of collection info if there "index" is undefined.
+     * @returns {Array} a list of collection info if there is no "index".
      *
      * access a specific collection given an index into the collections array.
      *
-     * @param {type} index - of the desired collection or undefined
+     * @param {type} index - of the desired collection info or undefined for all collections info
      * @returns {Array|Collections@call;collections@call;then}
      */
     async get(index) {

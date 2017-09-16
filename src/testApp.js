@@ -28,7 +28,6 @@ const conn = new TaxiiConnect("https://test.freetaxii.com:8000", "user-me", "use
 // make sure the path starts and ends with a "/"
 const server = new Server("/taxii/", conn);
 
-
 server.discovery().then(discovery => {
     console.log("----> Server discovery \n" + JSON.stringify(discovery));
 
@@ -44,13 +43,6 @@ server.discovery().then(discovery => {
          theCollection.get().then(info => {
             console.log("----> Server theCollection.get() \n" + JSON.stringify(info));
          });
-    });
-
-    server.api_roots().then(apiroots => {
-        console.log("----> Server apiroots \n" + JSON.stringify(apiroots));
-        apiroots.map(apiroot => {
-            console.log("----> Server apiroots apiroot \n" + JSON.stringify(apiroot));
-        });
     });
 
 });

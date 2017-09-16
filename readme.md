@@ -64,5 +64,4 @@ of attributes of the TAXII 2.0 server responses.
 
 
 ### Status
-experimental, not yet finished, not tested, not ready.
-Waiting for a TAXII 2.0 server to connect to.
+not finished, not tested.
