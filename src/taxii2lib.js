@@ -25,14 +25,20 @@ export class TaxiiConnect {
         this.user = user;
         this.password = password;
 
+        this.headers = new Headers({
+            'Accept': 'application/vnd.oasis.taxii+json',
+            'version': '2.0',
+            'Authorization': 'Basic ' + btoa(this.user + ":" + this.password)
+        });
+
         this.getConfig = {
             'method': 'get',
-            'headers': {'Accept': 'application/vnd.oasis.taxii+json', 'version': '2.0'}
+            'headers': this.headers
         };
 
         this.postConfig = {
             'method': 'post',
-            'headers': {'Accept': 'application/vnd.oasis.taxii+json', 'version': '2.0'}
+            'headers': this.headers
         };
     }
 
