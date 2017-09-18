@@ -24,11 +24,14 @@ export class TaxiiConnect {
         this.baseURL = TaxiiConnect.withoutLastSlash(url);
         this.user = user;
         this.password = password;
+        this.hash = btoa(this.user + ":" + this.password);
+        // token from the server
+        this.token = null;
 
         this.headers = new Headers({
             'Accept': 'application/vnd.oasis.taxii+json',
             'version': '2.0',
-            'Authorization': 'Basic ' + btoa(this.user + ":" + this.password)
+            'Authorization': 'Basic ' + this.hash
         });
 
         this.getConfig = {
@@ -41,6 +44,34 @@ export class TaxiiConnect {
             'headers': this.headers
         };
     }
+
+// if get a (JWT) token back from the server.
+// should store the token?  --> need to check token expiration
+// ---> todo
+// async login(authPath) {
+//    // setup the request
+//    const loginConfig = {
+//                'method': 'post',
+//                'credentials': 'same-origin',  // 'include' to send a cookie with the request?
+//                'mode': 'cors',
+//                'redirect': 'follow',
+//                'headers': {
+//                    'Content-Type': 'application/json',
+//                    'Accept': 'application/vnd.oasis.taxii+json',
+//                    'version': '2.0',
+//                    'Authorization': 'Basic ' + btoa(this.user + ":" + this.password)
+//                },
+//                'timeout': 5000
+//    };
+//    // get the server token
+//    await (await (fetch(this.baseURL + authPath, loginConfig).then(res => {
+//           this.token = res.json().token; // check this
+//           return this.token;
+//       }).catch(err => {
+//           this.token = null;
+//           console.log('====> TaxiiConnect error login to server: ', err);
+//    })));
+// }
 
     /**
      * send an async request (get or post) to the taxii2 server.
