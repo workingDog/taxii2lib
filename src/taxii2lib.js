@@ -53,10 +53,7 @@ export class TaxiiConnect {
      * @returns {unresolved} - the promise response result in json.
      */
     async asyncFetch(path, config, filter) {
-        let fullPath = path;
-        if (filter !== undefined) {
-            fullPath = path + "?" + TaxiiConnect.asQueryString(filter);
-        }
+        let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
         let results = await (await (fetch(fullPath, config).then(res => {
             return res.json();
         }).catch(err => {
