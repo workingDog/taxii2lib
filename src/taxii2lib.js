@@ -1,4 +1,6 @@
 
+/* global encodeURIComponent, fetch */
+
 /**
  * TAXII 2.0 Javascript client library.
  * 
@@ -25,8 +27,6 @@ export class TaxiiConnect {
         this.user = user;
         this.password = password;
         this.hash = btoa(this.user + ":" + this.password);
-        // token from the server
-        this.token = null;
 
         this.headers = new Headers({
             'Accept': 'application/vnd.oasis.taxii+json',
@@ -45,41 +45,18 @@ export class TaxiiConnect {
         };
     }
 
-// if get a (JWT) token back from the server.
-// should store the token?  --> need to check token expiration
-// ---> todo
-// async login(authPath) {
-//    // setup the request
-//    const loginConfig = {
-//                'method': 'post',
-//                'credentials': 'same-origin',  // 'include' to send a cookie with the request?
-//                'mode': 'cors',
-//                'redirect': 'follow',
-//                'headers': {
-//                    'Content-Type': 'application/json',
-//                    'Accept': 'application/vnd.oasis.taxii+json',
-//                    'version': '2.0',
-//                    'Authorization': 'Basic ' + btoa(this.user + ":" + this.password)
-//                },
-//                'timeout': 5000
-//    };
-//    // get the server token
-//    await (await (fetch(this.baseURL + authPath, loginConfig).then(res => {
-//           this.token = res.json().token; // check this
-//           return this.token;
-//       }).catch(err => {
-//           this.token = null;
-//           console.log('====> TaxiiConnect error login to server: ', err);
-//    })));
-// }
-
     /**
      * send an async request (get or post) to the taxii2 server.
-     * @param {type} fullPath - the full path to connect to.
+     * @param {type} path - the full path to connect to.
      * @param {type} config - the request configuration, see getConfig and postConfig
+     * @param {type} filter - the filter object describing the filtering to be done
      * @returns {unresolved} - the promise response result in json.
      */
-    async asyncFetch(fullPath, config) {
+    async asyncFetch(path, config, filter) {
+        let fullPath = path;
+        if (filter !== undefined) {
+            fullPath = path + "?" + TaxiiConnect.asQueryString(filter);
+        }
         let results = await (await (fetch(fullPath, config).then(res => {
             return res.json();
         }).catch(err => {
@@ -97,13 +74,14 @@ export class TaxiiConnect {
      * no server request is performed.
      * To force a server request used invalidate first, e.g server.invalidate()
      *
-     * @param {type} fullPath - the full path to connect to.
+     * @param {type} path - the path to connect to.
      * @param {type} options - an option object of the form: { "cache": {}, "flag": false }
+     * @param {type} filter - the filter object describing the filtering to be done
      * @returns {unresolved}
      */
-    async fetchThis(fullPath, options) {
+    async fetchThis(path, options, filter) {
         if (!options.flag) {
-            options.cache = await (this.asyncFetch(fullPath, this.getConfig));
+            options.cache = await (this.asyncFetch(path, this.getConfig, filter));
             options.flag = true;
             return options.cache;
         } else {
@@ -113,20 +91,24 @@ export class TaxiiConnect {
 
     // want the url to be without the last slash
     static withoutLastSlash(aUrl) {
-        let theUrl = aUrl;
-        if (aUrl.substr(-1) === '/') {
-            theUrl = aUrl.substr(0, aUrl.length - 1);
-        }
-        return theUrl;
+        return (aUrl.substr(-1) === '/') ? aUrl.substr(0, aUrl.length - 1) : aUrl;
     }
 
     // want the url to be with the last slash
     static withLastSlash(aUrl) {
-        let theUrl = aUrl;
-        if (aUrl.substr(-1) !== '/') {
-            theUrl = aUrl + "/";
-        }
-        return theUrl;
+        return (aUrl.substr(-1) !== '/') ? aUrl + "/" : aUrl;
+    }
+
+    // convert the filter object into a query string
+    static asQueryString(filter) {
+        var esc = encodeURIComponent;
+        var query = Object.keys(filter)
+                .map(k => {
+                    let value = (k !== "added_after") ? "match[" + k + "]" : k;
+                    return esc(value) + '=' + esc(filter[k]);
+                })
+                .join('&');
+        return query;
     }
 }
 
@@ -329,7 +311,8 @@ export class Collection {
     /**
      * check that the collection allows reading, if true then return the function passed in
      * else log an error
-     * @param {func} - the function to return 
+     * @param {type} func - the function to return if the collection allows reading it 
+     * @returns {unresolved}
      */
     ifCanRead(func) {
         if (this.collectionInfo.can_read) {
@@ -342,7 +325,8 @@ export class Collection {
     /**
      * check that the collection allows writing, if true then return the function passed in
      * else log an error
-     * @param {func} - the function to return 
+     * @param {type} func - the function to return if the collection allows writing to it 
+     * @returns {unresolved}
      */
     ifCanWrite(func) {
         if (this.collectionInfo.can_write) {
@@ -361,17 +345,25 @@ export class Collection {
 
     /**
      * retrieves STIX2 bundle from this Collection.
+     * 
+     * @param {type} filter - the filter object describing the filtering to be done 
+     * example: {"added_after": "2016-02-01T00:00:01.000Z"}
+     *          {"type": ["incident","ttp","actor"]}
+     * @returns {Collection.ifCanRead.func|unresolved}
      */
-    async getObjects() {
-        return this.ifCanRead(this.conn.fetchThis(this.path + "/objects/", this.objsOptions));
+    async getObjects(filter) {
+        return this.ifCanRead(this.conn.fetchThis(this.path + "objects/", this.objsOptions, filter));
     }
 
     /**
      * returns a specific STIX2 object from this Collection objects bundle.
      * obj_id must be a STIX object id.
+     * @param {type} obj_id - the STIX object id to retrieve
+     * @param {type} filter - the filter object describing the filtering to be done 
+     * example: {"version": "2016-01-01T01:01:01.000Z"}
      */
-    async getObject(obj_id) {
-        let result = await (await (this.ifCanRead(this.conn.fetchThis(this.path + "/objects/" + obj_id + "/", this.objOptions).then(bundle => {
+    async getObject(obj_id, filter) {
+        let result = await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter).then(bundle => {
             return bundle.objects.find(obj => obj.id === obj_id);
         }))));
         return result;
@@ -380,22 +372,27 @@ export class Collection {
     /**
      * adds a STIX2 bundle to this Collection objects.
      * returns a Taxii2 Status object
+     * @param {type} bundle - the STIX bundle object to add
      */
     async addObject(bundle) {
-        return this.ifCanWrite(this.conn.asyncFetch(this.path + "/objects/", this.conn.postConfig));
+        return this.ifCanWrite(this.conn.asyncFetch(this.path + "objects/", this.conn.postConfig));
     }
 
     /**
+     * manifests are metadata about the objects.
+     * 
      * retrieves a manifest about objects from this Collection
      * returns objects, the list of manifest-entry if obj_id is undefined
      * or
      * retrieves the manifest about a specific object (obj_id) from this Collection
      * returns specific manifest-entry
+     * 
+     * @param {type} obj_id - the STIX object id to get he manifest for
      */
     async getManifest(obj_id) {
         if (typeof obj_id === "undefined") {
             // return the list of manifest-entry
-            this.ifCanRead(await this.conn.fetchThis(this.path + "/manifest/", this.manOptions));
+            this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions));
             return this.manOptions.cache.objects;
         } else {
             // return the specified manifest-entry object

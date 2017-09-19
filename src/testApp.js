@@ -66,6 +66,22 @@ theCollection.getObjects().then(bundle => {
     console.log("----> theCollection.getObjects() \n" + JSON.stringify(bundle));
 });
 
+theCollection.getObjects({"type": ["incident","ttp","actor"]}).then(bundle => {
+        console.log("+++++> theCollection.getObjects(filter1) \n" + JSON.stringify(bundle.objects[0]));
+});
+
+theCollection.getObjects({"id": "indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb"}).then(bundle => {
+        console.log("+++++> theCollection.getObjects(filter2) \n" + JSON.stringify(bundle.objects[0]));
+});
+
+theCollection.getObjects({"added_after": "2016-02-01T00:00:01.000Z", "version": "2016-01-01T01:01:01.000Z"}).then(bundle => {
+        console.log("+++++> theCollection.getObjects(filter3) \n" + JSON.stringify(bundle.objects[0]));
+});
+
+theCollection.getObjects({"type": "incident", "version": "2016-01-01T01:01:01.000Z"}).then(bundle => {
+        console.log("+++++> theCollection.getObjects(filter4) \n" + JSON.stringify(bundle.objects[0]));
+});
+
 theCollection.getObject("indicator--09303e92-608b-4b19-b453-109b170f17d3").then(stix => {
     console.log("----> theCollection.getObject(id) \n" + JSON.stringify(stix));
 });
