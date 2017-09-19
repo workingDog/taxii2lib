@@ -38,7 +38,7 @@ The following TAXII 2.0 API services are supported with these corresponding asyn
 - Get Objects --> collection.getObjects(filter)
 - Add Objects --> collection.addObject(bundle)
 - Get an Object --> collection.getObject(obj_id, filter)
-- Get Object Manifests --> collection.getManifest() and collection.getManifest(obj_id)
+- Get Object Manifests --> collection.getManifest(filter) and collection.getManifest(obj_id, filter)
 - Get Status --> status.get()
 
 Example:

@@ -385,11 +385,12 @@ export class Collection {
      * returns specific manifest-entry
      * 
      * @param {type} obj_id - the STIX object id to get he manifest for
+     * @param {type} filter - the filter object describing the filtering to be done
      */
-    async getManifest(obj_id) {
+    async getManifest(obj_id, filter) {
         if (typeof obj_id === "undefined") {
             // return the list of manifest-entry
-            this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions));
+            this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions, filter));
             return this.manOptions.cache.objects;
         } else {
             // return the specified manifest-entry object
