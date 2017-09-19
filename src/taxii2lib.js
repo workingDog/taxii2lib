@@ -93,7 +93,7 @@ export class TaxiiConnect {
 
     // want the url to be with the last slash
     static withLastSlash(aUrl) {
-        return (aUrl.substr(-1) !== '/') ? aUrl + "/" : aUrl;
+        return (aUrl.substr(-1) === '/') ? aUrl : aUrl + "/";
     }
 
     // convert the filter object into a query string
@@ -101,7 +101,7 @@ export class TaxiiConnect {
         var esc = encodeURIComponent;
         var query = Object.keys(filter)
                 .map(k => {
-                    let value = (k !== "added_after") ? "match[" + k + "]" : k;
+                    let value = (k === "added_after") ? k : "match[" + k + "]";
                     return esc(value) + '=' + esc(filter[k]);
                 })
                 .join('&');
