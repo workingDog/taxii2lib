@@ -62,8 +62,8 @@ Example:
 See the [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/) for the list 
 of attributes of the TAXII 2.0 server responses.
 
-Note the optional **filter** object passed to the methods collection.getObjects(filter) and 
-collection.getObject(obj_id, filter) is of the form:
+Note the optional **filter** object passed to the methods collection.getObjects(filter), 
+collection.getObject(obj_id, filter) and collection.getManifest(filter) is of the form:
 
     {"type": ["incident","ttp","actor"]}
     {"id": "indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb"}
