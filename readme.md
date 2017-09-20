@@ -20,12 +20,7 @@ to fetch TAXII 2.0 server resources. It has five classes, namely:
 - *Server*, endpoint for retrieving the discovery and api roots resources.
 - *Collections*, endpoint for retrieving the list of collection resources. 
 - *Collection*, endpoint for retrieving a collection resource and associated objects. 
-- *Status*, endpoint for retrieving a status resources. 
- 
-### References
- 
-1) [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/)
- 
+- *Status*, endpoint for retrieving a status resource. 
 
 ### Usage
 
@@ -70,6 +65,12 @@ is of the form:
     {"id": "indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb"}
     {"added_after": "2016-02-01T00:00:01.000Z", "version": "2016-01-01T01:01:01.000Z"}
     {"type": "incident", "version": "2016-01-01T01:01:01.000Z"}
+
+ 
+### References
+ 
+1) [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/)
+ 
 
 ### Status
 not finished, not tested.
