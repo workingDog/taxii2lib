@@ -29,9 +29,7 @@ const server = new Server("/taxii/", conn);
 
 server.discovery().then(discovery => {
     console.log("----> Server discovery \n" + JSON.stringify(discovery));
-
     console.log("----> Server discovery.title \n" + discovery.title);
-
     // get the api roots url
     discovery.api_roots.map(apiroot => {
         console.log("----> Server discovery.api_roots apiroot \n" + JSON.stringify(apiroot));
@@ -43,7 +41,6 @@ server.discovery().then(discovery => {
             console.log("----> Server theCollection.get() \n" + JSON.stringify(info));
         });
     });
-
 });
 
 // returns all api roots that could be retrieved (not those with a could not connect or had an error)
@@ -78,9 +75,9 @@ theCollection.getObjects({"type": ["incident", "ttp", "actor"]}).then(bundle => 
     console.log("+++++> theCollection.getObjects(filter1) \n" + JSON.stringify(bundle.objects[0]));
 });
 
-theCollection.getObjects({"id": "indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb"}).then(bundle => {
-    console.log("+++++> theCollection.getObjects(filter2) \n" + JSON.stringify(bundle.objects[0]));
-});
+//theCollection.getObjects({"id": "indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb"}).then(bundle => {
+//    console.log("+++++> theCollection.getObjects(filter2) \n" + JSON.stringify(bundle.objects[0]));
+//});
 
 theCollection.getObjects({"added_after": "2016-02-01T00:00:01.000Z", "version": "2016-01-01T01:01:01.000Z"}).then(bundle => {
     console.log("+++++> theCollection.getObjects(filter3) \n" + JSON.stringify(bundle.objects[0]));
@@ -90,9 +87,9 @@ theCollection.getObjects({"type": "incident", "version": "2016-01-01T01:01:01.00
     console.log("+++++> theCollection.getObjects(filter4) \n" + JSON.stringify(bundle.objects[0]));
 });
 
-theCollection.getObject("indicator--09303e92-608b-4b19-b453-109b170f17d3").then(stix => {
-    console.log("----> theCollection.getObject(id) \n" + JSON.stringify(stix));
-});
+//theCollection.getObject("indicator--09303e92-608b-4b19-b453-109b170f17d3").then(stix => {
+//    console.log("----> theCollection.getObject(id) \n" + JSON.stringify(stix));
+//});
 
 //theCollection.addObject(testBundle).then(status => {
 //    console.log("---->  theCollection.addObject() \n" + JSON.stringify(status));

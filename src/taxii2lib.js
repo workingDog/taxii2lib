@@ -1,5 +1,5 @@
 
-/* global encodeURIComponent, fetch */
+/* global encodeURIComponent, fetch, Promise */
 
 /**
  * TAXII 2.0 Javascript client library.
@@ -144,7 +144,7 @@ export class Server {
     }
 
     /**
-     * to obtain information about a TAXII Server and get a list of API Roots. 
+     * retrieve the information about a TAXII Server and the list of API Roots. 
      * @returns {unresolved}
      */
     async discovery() {
@@ -152,6 +152,9 @@ export class Server {
     }
 
     /**
+     * retrieve the api roots information objects.
+     * Note: unreachable roots are not part of the results.
+     * 
      * API Roots are logical groupings of TAXII Channels, Collections, and related functionality.
      * Each API Root contains a set of Endpoints that a TAXII Client contacts in order to interact with the TAXII Server.
      * This returns the api roots information objects, not the string url.
@@ -164,6 +167,8 @@ export class Server {
     }
 
     /**
+     * retrieve a map of key=the api root url and value=the api root object.
+     * 
      * API Roots are logical groupings of TAXII Channels, Collections, and related functionality.
      * Each API Root contains a set of Endpoints that a TAXII Client contacts in order to interact with the TAXII Server.
      * @returns {type} - a map of key=the url and value=the api root object.
@@ -179,32 +184,23 @@ export class Server {
     /**
      * private function to retrieve the api roots
      * @param {type} discovery - discovery object
-     * @param {type} apiRootMap - optional map of key=url, value=api root object
+     * @param {type} apiRootMap - a map of key=url, value=api root object
      * @returns {Array} of api root objects
      */
     async _getApiRoots(discovery, apiRootMap) {
         if (!this.apiOptions.flag) {
             // clear the cache
             this.apiOptions.cache = [];
-            // fetch all the api_roots url in parallel
-            const allPromises = discovery.api_roots.map(async url => {
-                try {
-                    return this.conn.asyncFetch(url, this.conn.getConfig);
-                } catch (err) {
-                    console.log("----> in Server could not fetch api_root url: " + url);
+            // fetch all the api_roots in parallel
+            await Promise.all(discovery.api_roots.map(async url => {
+                let apiroot = await this.conn.asyncFetch(url, this.conn.getConfig);
+                // add to the map
+                if (apiRootMap !== undefined) {
+                    apiRootMap.set(url, apiroot);
                 }
-            });
-            // process the promises 
-            let i = 0;
-            for (const aPromise of allPromises) {
-                let apiroot = await aPromise;
                 // add to the array of results
                 this.apiOptions.cache.push(apiroot);
-                // add to the map
-                if (apiRootMap !== undefined)
-                    apiRootMap.set(discovery.api_roots[i], apiroot);
-                i = i + 1;
-            }
+            }));
             // remove the undefined and empty elements, i.e. those we could not connect to.
             this.apiOptions.cache = this.apiOptions.cache.filter(element => {
                 return (element !== undefined && !Server.isEmpty(element));
@@ -250,10 +246,10 @@ export class Collections {
     }
 
     /**
-     * provides information about the Collections hosted under this API Root.
+     * get() -> provides information about the Collections hosted under this API Root.
      * @returns {Array} a list of collection info if there is no "index".
      *
-     * access a specific collection given an index into the collections array.
+     * get(index) -> access a specific collection given an index into the collections array.
      *
      * @param {type} index - of the desired collection info or undefined for all collections info
      * @returns {Array|Collections@call;collections@call;then}
