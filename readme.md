@@ -38,7 +38,7 @@ The following TAXII 2.0 API services are supported with these corresponding asyn
 - Get Objects --> collection.getObjects(filter)
 - Add Objects --> collection.addObject(bundle)
 - Get an Object --> collection.getObject(obj_id, filter)
-- Get Object Manifests --> collection.getManifest(filter) and collection.getManifest(obj_id, filter)
+- Get Object Manifests --> collection.getManifests(filter) and collection.getManifest(obj_id, filter)
 - Get Status --> status.get()
 
 Example:
@@ -63,7 +63,8 @@ See the [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation
 of attributes of the TAXII 2.0 server responses.
 
 Note the optional **filter** object passed to the methods collection.getObjects(filter), 
-collection.getObject(obj_id, filter) and collection.getManifest(filter) is of the form:
+collection.getObject(obj_id, filter), collection.getManifests(filter) and collection.getManifest(obj_id, filter) 
+is of the form:
 
     {"type": ["incident","ttp","actor"]}
     {"id": "indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb"}

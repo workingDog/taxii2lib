@@ -49,7 +49,7 @@ export class TaxiiConnect {
      * send an async request (get or post) to the taxii2 server.
      * @param {type} path - the full path to connect to.
      * @param {type} config - the request configuration, see getConfig and postConfig
-     * @param {type} filter - the filter object describing the filtering to be done
+     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
      * @returns {unresolved} - the promise response result in json.
      */
     async asyncFetch(path, config, filter) {
@@ -73,7 +73,7 @@ export class TaxiiConnect {
      *
      * @param {type} path - the path to connect to.
      * @param {type} options - an option object of the form: { "cache": {}, "flag": false }
-     * @param {type} filter - the filter object describing the filtering to be done
+     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
      * @returns {unresolved}
      */
     async fetchThis(path, options, filter) {
@@ -343,7 +343,7 @@ export class Collection {
     /**
      * retrieves STIX2 bundle from this Collection.
      * 
-     * @param {type} filter - the filter object describing the filtering to be done 
+     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
      * example: {"added_after": "2016-02-01T00:00:01.000Z"}
      *          {"type": ["incident","ttp","actor"]}
      * @returns {Collection.ifCanRead.func|unresolved}
@@ -356,7 +356,7 @@ export class Collection {
      * returns a specific STIX2 object from this Collection objects bundle.
      * obj_id must be a STIX object id.
      * @param {type} obj_id - the STIX object id to retrieve
-     * @param {type} filter - the filter object describing the filtering to be done 
+     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
      * example: {"version": "2016-01-01T01:01:01.000Z"}
      */
     async getObject(obj_id, filter) {
@@ -378,27 +378,31 @@ export class Collection {
     /**
      * manifests are metadata about the objects.
      * 
-     * retrieves a manifest about objects from this Collection
-     * returns objects, the list of manifest-entry if obj_id is undefined
-     * or
+     * retrieves all manifest about objects from this Collection.
+     * returns the list of manifest-entry
+     *
+     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
+     */
+    async getManifests(filter) {
+         this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions, filter));
+         return this.manOptions.cache.objects;
+    }
+
+    /**
+     * manifests are metadata about the objects.
+     *
      * retrieves the manifest about a specific object (obj_id) from this Collection
      * returns specific manifest-entry
-     * 
+     *
      * @param {type} obj_id - the STIX object id to get he manifest for
-     * @param {type} filter - the filter object describing the filtering to be done
+     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
      */
     async getManifest(obj_id, filter) {
-        if (typeof obj_id === "undefined") {
-            // return the list of manifest-entry
-            this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions, filter));
-            return this.manOptions.cache.objects;
-        } else {
-            // return the specified manifest-entry object
-            return await (this.getManifest().then(objects => {
-                return objects.find(obj => obj.id === obj_id);
-            }));
-        }
+          return await (this.getManifests(filter).then(objects => {
+              return objects.find(obj => obj.id === obj_id);
+          }));
     }
+
 }
 
 /**

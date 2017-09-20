@@ -90,7 +90,7 @@ theCollection.getObject("indicator--09303e92-608b-4b19-b453-109b170f17d3").then(
 //    console.log("---->  theCollection.addObject() \n" + JSON.stringify(status));
 //});
 
-//theCollection.getManifest().then(objList => {
+//theCollection.getManifests().then(objList => {
 //    console.log("----> theCollection.getManifest() \n" + JSON.stringify(objList));
 //    objList.map(entry => {
 //        console.log("----> theCollection manifest entry \n" + JSON.stringify(entry));
