@@ -99,12 +99,10 @@ export class TaxiiConnect {
     // convert the filter object into a query string
     static asQueryString(filter) {
         var esc = encodeURIComponent;
-        var query = Object.keys(filter)
-                .map(k => {
-                    let value = (k === "added_after") ? k : "match[" + k + "]";
-                    return esc(value) + '=' + esc(filter[k]);
-                })
-                .join('&');
+        var query = Object.keys(filter).map(k => {
+            let value = (k === "added_after") ? k : "match[" + k + "]";
+            return esc(value) + '=' + esc(filter[k]);
+        }).join('&');
         return query;
     }
 }
@@ -166,11 +164,25 @@ export class Server {
     }
 
     /**
+     * API Roots are logical groupings of TAXII Channels, Collections, and related functionality.
+     * Each API Root contains a set of Endpoints that a TAXII Client contacts in order to interact with the TAXII Server.
+     * @returns {type} - a map of key=the url and value=the api root object.
+     */
+    async api_rootsMap() {
+        var apiRootMap = new Map();
+        await this.discovery().then(discovery => {
+            return this._getApiRoots(discovery, apiRootMap);
+        });
+        return apiRootMap;
+    }
+
+    /**
      * private function to retrieve the api roots
      * @param {type} discovery - discovery object
+     * @param {type} apiRootMap - optional map of key=url, value=api root object
      * @returns {Array} of api root objects
      */
-    async _getApiRoots(discovery) {
+    async _getApiRoots(discovery, apiRootMap) {
         if (!this.apiOptions.flag) {
             // clear the cache
             this.apiOptions.cache = [];
@@ -182,9 +194,16 @@ export class Server {
                     console.log("----> in Server could not fetch api_root url: " + url);
                 }
             });
-            // add the promises results to the array
+            // process the promises 
+            let i = 0;
             for (const aPromise of allPromises) {
-                this.apiOptions.cache.push(await aPromise);
+                let apiroot = await aPromise;
+                // add to the array of results
+                this.apiOptions.cache.push(apiroot);
+                // add to the map
+                if (apiRootMap !== undefined)
+                    apiRootMap.set(discovery.api_roots[i], apiroot);
+                i = i + 1;
             }
             // remove the undefined and empty elements, i.e. those we could not connect to.
             this.apiOptions.cache = this.apiOptions.cache.filter(element => {
@@ -384,8 +403,8 @@ export class Collection {
      * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
      */
     async getManifests(filter) {
-         this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions, filter));
-         return this.manOptions.cache.objects;
+        this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions, filter));
+        return this.manOptions.cache.objects;
     }
 
     /**
@@ -398,9 +417,9 @@ export class Collection {
      * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
      */
     async getManifest(obj_id, filter) {
-          return await (this.getManifests(filter).then(objects => {
-              return objects.find(obj => obj.id === obj_id);
-          }));
+        return await (this.getManifests(filter).then(objects => {
+            return objects.find(obj => obj.id === obj_id);
+        }));
     }
 
 }
