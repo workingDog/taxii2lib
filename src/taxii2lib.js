@@ -2,25 +2,25 @@
 /* global encodeURIComponent, fetch, Promise */
 
 /**
- * TAXII 2.0 Javascript client library.
+ * @file
+ * A TAXII 2.0 Javascript client library.
  * 
- * reference: https://oasis-open.github.io/cti-documentation/
+ * @see https://oasis-open.github.io/cti-documentation/
  * 
- * Author: R. Wathelet, September 2017.
- * Version: 0.1
+ * @author R. Wathelet, September 2017.
+ * @version 0.1
  */
 
-/* 
- * Provide for connecting to a TAXII 2.0 server using asynchronous communication.
+/** 
+ * Provide asynchronous network communications to a TAXII 2.0 server.
  */
 export class TaxiiConnect {
 
     /**
-     * For connecting to a Taxii2 server.
-     * @param {type} url - the base url of the Taxii2 server, e.g. https://example.com/
-     * @param {type} user - the user name required for authentication.
-     * @param {type} password - the user password required for authentication.
-     * @returns {TaxiiConnect} 
+     * provide network communication to a Taxii 2.0 server.
+     * @param {String} url - the base url of the Taxii2 server, for example https://example.com/
+     * @param {String} user - the user name required for authentication.
+     * @param {String} password - the user password required for authentication.
      */
     constructor(url, user, password) {
         this.baseURL = TaxiiConnect.withoutLastSlash(url);
@@ -46,11 +46,12 @@ export class TaxiiConnect {
     }
 
     /**
-     * send an async request (get or post) to the taxii2 server.
-     * @param {type} path - the full path to connect to.
-     * @param {type} config - the request configuration, see getConfig and postConfig
-     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
-     * @returns {unresolved} - the promise response result in json.
+     * send an async request (GET or POST) to the taxii2 server.
+     * 
+     * @param {String} path - the full path to connect to.
+     * @param {Object} config - the request configuration, see getConfig and postConfig for examples
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string
+     * @returns {Promise} the server response in json.
      */
     async asyncFetch(path, config, filter) {
         let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
@@ -63,18 +64,18 @@ export class TaxiiConnect {
     }
 
     /**
-     * send a get async request to the taxii2 server.
+     * send a GET async request to the taxii2 server.
      *
-     * The response is passed to the cache of the options, and
-     * the options flag is set to true if a server request was performed.
-     * Otherwise if the options.flag is true, the cached response (options.cache) is returned and
+     * The server response is assigned to the cache attribute of the options object, and
+     * the options flag attribute is set to true if a server request was performed.
+     * Otherwise if the options.flag is initially true, the cached response (options.cache) is returned and
      * no server request is performed.
-     * To force a server request used invalidate first, e.g server.invalidate()
+     * To force a server request used invalidate(), for example: server.invalidate()
      *
-     * @param {type} path - the path to connect to.
-     * @param {type} options - an option object of the form: { "cache": {}, "flag": false }
-     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
-     * @returns {unresolved}
+     * @param {String} path - the path to connect to.
+     * @param {Object} options - an option object of the form: { "cache": {}, "flag": false }
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string
+     * @returns {Promise} the server response object
      */
     async fetchThis(path, options, filter) {
         if (!options.flag) {
@@ -86,17 +87,29 @@ export class TaxiiConnect {
         }
     }
 
-    // want the url to be without the last slash
-    static withoutLastSlash(aUrl) {
-        return (aUrl.substr(-1) === '/') ? aUrl.substr(0, aUrl.length - 1) : aUrl;
+    /**
+     * return the url without the last slash.
+     * @param {String} url - the URL string to process.
+     * @returns {String} the url without the last slash.
+     */
+    static withoutLastSlash(url) {
+        return (url.substr(-1) === '/') ? url.substr(0, url.length - 1) : url;
     }
 
-    // want the url to be with the last slash
-    static withLastSlash(aUrl) {
-        return (aUrl.substr(-1) === '/') ? aUrl : aUrl + "/";
+    /**
+     * return the url with a terminating slash.
+     * @param {String} url - the URL string to process.
+     * @returns {String} the url with a terminating slash.
+     */
+    static withLastSlash(url) {
+        return (url.substr(-1) === '/') ? url : url + "/";
     }
 
-    // convert the filter object into a query string
+    /**
+     * convert a filter object into a query string.
+     * @param {Object} filter - the filter object to process.
+     * @returns {String} the query string corresponding to the filter object.
+     */
     static asQueryString(filter) {
         var esc = encodeURIComponent;
         var query = Object.keys(filter).map(k => {
@@ -113,9 +126,9 @@ export class TaxiiConnect {
 export class Server {
 
     /**
-     * a TAXII Server endpoint representation.
-     * @param {type} path - the path to the server to retrieve the discovery endpoint, e.g. "/taxii/"
-     * @param {type} conn - a TaxiiConnection class instance.
+     * A TAXII Server endpoint representation.
+     * @param {String} path - the path to the server discovery endpoint, for example "/taxii/"
+     * @param {TaxiiConnect} conn - a TaxiiConnection instance providing network communications.
      */
     constructor(path, conn) {
         this.path = TaxiiConnect.withLastSlash(path);
@@ -127,7 +140,7 @@ export class Server {
 
     /**
      * determine if the obj is empty, {}
-     * @param {type} obj - the object to test
+     * @param {Object} obj - the object to test
      * @returns {Boolean} - true if empty else false
      */
     static isEmpty(obj) {
@@ -135,8 +148,8 @@ export class Server {
     }
 
     /**
-     * reset the options flags so that a server request will be required 
-     * to get the results, rather than from cache.
+     * reset the internal options flags so that the next method call of this class will  
+     * send a request to the server rather than retreive the results from cache.
      */
     invalidate() {
         this.disOptions.flag = false;
@@ -145,7 +158,7 @@ export class Server {
 
     /**
      * retrieve the information about a TAXII Server and the list of API Roots. 
-     * @returns {unresolved}
+     * @returns {Promise} the server discovery information object.
      */
     async discovery() {
         return this.conn.fetchThis(this.conn.baseURL + this.path, this.disOptions);
@@ -157,8 +170,8 @@ export class Server {
      * 
      * API Roots are logical groupings of TAXII Channels, Collections, and related functionality.
      * Each API Root contains a set of Endpoints that a TAXII Client contacts in order to interact with the TAXII Server.
-     * This returns the api roots information objects, not the string url.
-     * @returns {Server@call;discovery@call;then} the api roots information objects
+     * This returns the api roots information objects from the string urls.
+     * @returns {Promise} the Array of api roots information objects
      */
     async api_roots() {
         return this.discovery().then(discovery => {
@@ -171,7 +184,7 @@ export class Server {
      * 
      * API Roots are logical groupings of TAXII Channels, Collections, and related functionality.
      * Each API Root contains a set of Endpoints that a TAXII Client contacts in order to interact with the TAXII Server.
-     * @returns {type} - a map of key=the url and value=the api root object.
+     * @returns {Promise} a Map of key=the url and value=the api root object.
      */
     async api_rootsMap() {
         var apiRootMap = new Map();
@@ -183,9 +196,9 @@ export class Server {
 
     /**
      * private function to retrieve the api roots
-     * @param {type} discovery - discovery object
-     * @param {type} apiRootMap - a map of key=url, value=api root object
-     * @returns {Array} of api root objects
+     * @param {discovery} discovery - a discovery object
+     * @param {Map} apiRootMap - a map of key=url, value=api root object
+     * @returns {Promise} the Array of api roots information objects
      */
     async _getApiRoots(discovery, apiRootMap) {
         if (!this.apiOptions.flag) {
@@ -201,7 +214,7 @@ export class Server {
                 // add to the array of results
                 this.apiOptions.cache.push(apiroot);
             }));
-            // remove the undefined and empty elements, i.e. those we could not connect to.
+            // remove the undefined and empty elements, that is those we could not connect to.
             this.apiOptions.cache = this.apiOptions.cache.filter(element => {
                 return (element !== undefined && !Server.isEmpty(element));
             });
@@ -225,10 +238,10 @@ export class Server {
 export class Collections {
 
     /**
-     * A TAXII Collections for a specific api root endpoint.
+     * A TAXII Collections for a specific api root path.
      * The collections resource is a simple wrapper around a list of collection resources.
-     * @param {type} api_root_path - the full path to the desired api root
-     * @param {type} conn - a TaxiiConnection class instance.
+     * @param {String} api_root_path - the full path to the desired api root endpoint
+     * @param {TaxiiConnection} conn a TaxiiConnection class instance.
      */
     constructor(api_root_path, conn) {
         this.api_root_path = TaxiiConnect.withLastSlash(api_root_path);
@@ -238,21 +251,21 @@ export class Collections {
     }
 
     /**
-     * reset the options flags so that a server request will be required 
-     * to get the results, rather than from cache.
+     * reset the internal options flags so that the next method call of this class will  
+     * send a request to the server rather than retreive the results from cache.
      */
     invalidate() {
         this.options.flag = false;
     }
 
     /**
-     * get() -> provides information about the Collections hosted under this API Root.
-     * @returns {Array} a list of collection info if there is no "index".
+     * provide information about the Collections hosted under this API Root.
+     * 
+     * If no argument is provided get(), this method returns the list of collection objects.
+     * If an index integer is provided, this method returns a specific collection into the collections list.
      *
-     * get(index) -> access a specific collection given an index into the collections array.
-     *
-     * @param {type} index - of the desired collection info or undefined for all collections info
-     * @returns {Array|Collections@call;collections@call;then}
+     * @param {Integer} index - the index of the desired collection object.
+     * @returns {Array|Object} an array of collection objects, or a specific collection object.
      */
     async get(index) {
         if (typeof index === "undefined") {
@@ -292,9 +305,9 @@ export class Collection {
 
     /**
      * Collection resource endpoint.
-     * @param {type} collectionInfo - the collection resource info of this endpoint.
-     * @param {type} api_root_path - the full path to the desired api root
-     * @param {type} conn - a TaxiiConnection class instance.
+     * @param {Collection} collectionInfo - the collection object of this endpoint.
+     * @param {String} api_root_path - the full path to the desired api root endpoint.
+     * @param {TaxiiConnection} conn - a TaxiiConnection class instance.
      */
     constructor(collectionInfo, api_root_path, conn) {
         this.collectionInfo = collectionInfo;
@@ -310,8 +323,8 @@ export class Collection {
     }
 
     /**
-     * reset the options flags so that a server request will be required 
-     * to get the desired results, rather than from cache.
+     * reset the internal options flags so that the next method call of this class will  
+     * send a request to the server rather than retreive the results from cache.
      */
     invalidate() {
         this.colOptions.flag = false;
@@ -323,8 +336,8 @@ export class Collection {
     /**
      * check that the collection allows reading, if true then return the function passed in
      * else log an error
-     * @param {type} func - the function to return if the collection allows reading it 
-     * @returns {unresolved}
+     * @param {Function} func - the function to return if the collection allows reading it 
+     * @returns {Function} the function if this collection allow reading else undefined
      */
     ifCanRead(func) {
         if (this.collectionInfo.can_read) {
@@ -335,10 +348,9 @@ export class Collection {
     }
 
     /**
-     * check that the collection allows writing, if true then return the function passed in
-     * else log an error
-     * @param {type} func - the function to return if the collection allows writing to it 
-     * @returns {unresolved}
+     * check that the collection allows writing, if true then return the function passed in else log an error
+     * @param {Function} func - the function to return if the collection allows writing it 
+     * @returns {Function} the function if this collection allow writing else undefined
      */
     ifCanWrite(func) {
         if (this.collectionInfo.can_write) {
@@ -349,30 +361,31 @@ export class Collection {
     }
 
     /**
-     * retrieves the Collection.
+     * retrieve this Collection object.
+     * @returns {Promise} the Collection object
      */
     async get() {
         return this.ifCanRead(this.conn.fetchThis(this.path, this.colOptions));
     }
 
     /**
-     * retrieves STIX2 bundle from this Collection.
+     * retrieve a STIX-2 bundle from this Collection.
      * 
-     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
-     * example: {"added_after": "2016-02-01T00:00:01.000Z"}
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string. 
+     * For example: {"added_after": "2016-02-01T00:00:01.000Z"}
      *          {"type": ["incident","ttp","actor"]}
-     * @returns {Collection.ifCanRead.func|unresolved}
+     * @returns {Promise} the Bundle with the STIX-2 objects of this collection
      */
     async getObjects(filter) {
         return this.ifCanRead(this.conn.fetchThis(this.path + "objects/", this.objsOptions, filter));
     }
 
     /**
-     * returns a specific STIX2 object from this Collection objects bundle.
-     * obj_id must be a STIX object id.
-     * @param {type} obj_id - the STIX object id to retrieve
-     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
-     * example: {"version": "2016-01-01T01:01:01.000Z"}
+     * retrieve a specific STIX-2 object from this collection objects bundle.
+     * 
+     * @param {String} obj_id - the STIX-2 object id to retrieve
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string. 
+     * For example: {"version": "2016-01-01T01:01:01.000Z"}
      */
     async getObject(obj_id, filter) {
         let result = await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter).then(bundle => {
@@ -382,21 +395,20 @@ export class Collection {
     }
 
     /**
-     * adds a STIX2 bundle to this Collection objects.
-     * returns a Taxii2 Status object
-     * @param {type} bundle - the STIX bundle object to add
+     * add a STIX-2 bundle object to this Collection objects.
+     * @param {Bundle} bundle - the STIX-2 bundle object to add
+     * @return {Status} a status object 
      */
     async addObject(bundle) {
         return this.ifCanWrite(this.conn.asyncFetch(this.path + "objects/", this.conn.postConfig));
     }
 
     /**
-     * manifests are metadata about the objects.
+     * retrieve all manifests about objects from this Collection.
+     * Manifests are metadata about the objects.
      * 
-     * retrieves all manifest about objects from this Collection.
-     * returns the list of manifest-entry
-     *
-     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string. 
+     * @return {Array} an array of manifest entries object 
      */
     async getManifests(filter) {
         this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions, filter));
@@ -404,13 +416,12 @@ export class Collection {
     }
 
     /**
-     * manifests are metadata about the objects.
-     *
-     * retrieves the manifest about a specific object (obj_id) from this Collection
-     * returns specific manifest-entry
-     *
-     * @param {type} obj_id - the STIX object id to get he manifest for
-     * @param {type} filter - the filter object describing the filtering to be done to be added to the path as a query string
+     * retrieve the manifest about a specific object (obj_id) from this Collection. 
+     * Manifests are metadata about the objects.
+     * 
+     * @param {String} obj_id - the STIX-2 object id of the manifest to retrieve.
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string. 
+     * @return {Object} a manifest entry of the desired STIX-2 object. 
      */
     async getManifest(obj_id, filter) {
         return await (this.getManifests(filter).then(objects => {
@@ -427,10 +438,10 @@ export class Collection {
 export class Status {
 
     /**
-     * provides information about the status of a previous request.
-     * @param {type} api_root_path - the full path to the desired api root
-     * @param {type} status_id - the identifier of the status message being requested, for STIX objects, their id.
-     * @param {type} conn - a TaxiiConnection class instance.
+     * provide information about the status of a previous request.
+     * @param {String} api_root_path - the full path to the desired api root
+     * @param {String} status_id - the identifier of the status message being requested, for STIX objects, their id.
+     * @param {TaxiiConnection} conn - a TaxiiConnection class instance.
      */
     constructor(api_root_path, status_id, conn) {
         this.api_root_path = TaxiiConnect.withLastSlash(api_root_path);
@@ -440,7 +451,8 @@ export class Status {
     }
 
     /**
-     * retrieves the Status information about a request to add objects to a Collection.
+     * retrieve the Status information about a request to add objects to a Collection.
+     * @return {Promise} the status object
      */
     async get() {
         try {
