@@ -1,17 +1,16 @@
-
 /* global encodeURIComponent, fetch, Promise */
 
 /**
  * @file
  * A TAXII 2.0 Javascript client library.
- * 
+ *
  * @see https://oasis-open.github.io/cti-documentation/
- * 
+ *
  * @author R. Wathelet, September 2017.
  * @version 0.1
  */
 
-/** 
+/**
  * Provide asynchronous network communications to a TAXII 2.0 server.
  */
 export class TaxiiConnect {
@@ -47,7 +46,7 @@ export class TaxiiConnect {
 
     /**
      * send an async request (GET or POST) to the taxii2 server.
-     * 
+     *
      * @param {String} path - the full path to connect to.
      * @param {Object} config - the request configuration, see getConfig and postConfig for examples
      * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string
@@ -58,7 +57,7 @@ export class TaxiiConnect {
         let results = await (await (fetch(fullPath, config).then(res => {
             return res.json();
         }).catch(err => {
-            console.log('====> asyncFetch error: ', err);
+            throw new Error("fetch error: " + err);
         })));
         return results;
     }
@@ -148,7 +147,7 @@ export class Server {
     }
 
     /**
-     * reset the internal options flags so that the next method call of this class will  
+     * reset the internal options flags so that the next method call of this class will
      * send a request to the server rather than retreive the results from cache.
      */
     invalidate() {
@@ -157,7 +156,7 @@ export class Server {
     }
 
     /**
-     * retrieve the information about a TAXII Server and the list of API Roots. 
+     * retrieve the information about a TAXII Server and the list of API Roots.
      * @returns {Promise} the server discovery information object.
      */
     async discovery() {
@@ -167,7 +166,7 @@ export class Server {
     /**
      * retrieve the api roots information objects.
      * Note: unreachable roots are not part of the results.
-     * 
+     *
      * API Roots are logical groupings of TAXII Channels, Collections, and related functionality.
      * Each API Root contains a set of Endpoints that a TAXII Client contacts in order to interact with the TAXII Server.
      * This returns the api roots information objects from the string urls.
@@ -181,7 +180,7 @@ export class Server {
 
     /**
      * retrieve a map of key=the api root url and value=the api root object.
-     * 
+     *
      * API Roots are logical groupings of TAXII Channels, Collections, and related functionality.
      * Each API Root contains a set of Endpoints that a TAXII Client contacts in order to interact with the TAXII Server.
      * @returns {Promise} a Map of key=the url and value=the api root object.
@@ -230,10 +229,10 @@ export class Server {
 /**
  * Collections resource endpoint.
  * A TAXII Collections is an interface to a logical repository of CTI objects
- * provided by a TAXII Server and is used by TAXII Clients to send information 
+ * provided by a TAXII Server and is used by TAXII Clients to send information
  * to the TAXII Server or request information from the TAXII Server.
- * A TAXII Server can host multiple Collections per API Root, and Collections 
- * are used to exchange information in a request–response manner. 
+ * A TAXII Server can host multiple Collections per API Root, and Collections
+ * are used to exchange information in a request–response manner.
  */
 export class Collections {
 
@@ -251,7 +250,7 @@ export class Collections {
     }
 
     /**
-     * reset the internal options flags so that the next method call of this class will  
+     * reset the internal options flags so that the next method call of this class will
      * send a request to the server rather than retreive the results from cache.
      */
     invalidate() {
@@ -260,7 +259,7 @@ export class Collections {
 
     /**
      * provide information about the Collections hosted under this API Root.
-     * 
+     *
      * If no argument is provided get(), this method returns the list of collection objects.
      * If an index integer is provided, this method returns a specific collection into the collections list.
      *
@@ -323,7 +322,7 @@ export class Collection {
     }
 
     /**
-     * reset the internal options flags so that the next method call of this class will  
+     * reset the internal options flags so that the next method call of this class will
      * send a request to the server rather than retreive the results from cache.
      */
     invalidate() {
@@ -336,7 +335,7 @@ export class Collection {
     /**
      * check that the collection allows reading, if true then return the function passed in
      * else log an error
-     * @param {Function} func - the function to return if the collection allows reading it 
+     * @param {Function} func - the function to return if the collection allows reading it
      * @returns {Function} the function if this collection allow reading else undefined
      */
     ifCanRead(func) {
@@ -349,7 +348,7 @@ export class Collection {
 
     /**
      * check that the collection allows writing, if true then return the function passed in else log an error
-     * @param {Function} func - the function to return if the collection allows writing it 
+     * @param {Function} func - the function to return if the collection allows writing it
      * @returns {Function} the function if this collection allow writing else undefined
      */
     ifCanWrite(func) {
@@ -370,8 +369,8 @@ export class Collection {
 
     /**
      * retrieve a STIX-2 bundle from this Collection.
-     * 
-     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string. 
+     *
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string.
      * For example: {"added_after": "2016-02-01T00:00:01.000Z"}
      *          {"type": ["incident","ttp","actor"]}
      * @returns {Promise} the Bundle with the STIX-2 objects of this collection
@@ -382,9 +381,9 @@ export class Collection {
 
     /**
      * retrieve a specific STIX-2 object from this collection objects bundle.
-     * 
+     *
      * @param {String} obj_id - the STIX-2 object id to retrieve
-     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string. 
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string.
      * For example: {"version": "2016-01-01T01:01:01.000Z"}
      */
     async getObject(obj_id, filter) {
@@ -397,7 +396,7 @@ export class Collection {
     /**
      * add a STIX-2 bundle object to this Collection objects.
      * @param {Bundle} bundle - the STIX-2 bundle object to add
-     * @return {Status} a status object 
+     * @return {Status} a status object
      */
     async addObject(bundle) {
         return this.ifCanWrite(this.conn.asyncFetch(this.path + "objects/", this.conn.postConfig));
@@ -406,9 +405,9 @@ export class Collection {
     /**
      * retrieve all manifests about objects from this Collection.
      * Manifests are metadata about the objects.
-     * 
-     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string. 
-     * @return {Array} an array of manifest entries object 
+     *
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string.
+     * @return {Array} an array of manifest entries object
      */
     async getManifests(filter) {
         this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions, filter));
@@ -416,12 +415,12 @@ export class Collection {
     }
 
     /**
-     * retrieve the manifest about a specific object (obj_id) from this Collection. 
+     * retrieve the manifest about a specific object (obj_id) from this Collection.
      * Manifests are metadata about the objects.
-     * 
+     *
      * @param {String} obj_id - the STIX-2 object id of the manifest to retrieve.
-     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string. 
-     * @return {Object} a manifest entry of the desired STIX-2 object. 
+     * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string.
+     * @return {Object} a manifest entry of the desired STIX-2 object.
      */
     async getManifest(obj_id, filter) {
         return await (this.getManifests(filter).then(objects => {
@@ -455,11 +454,7 @@ export class Status {
      * @return {Promise} the status object
      */
     async get() {
-        try {
-            return this.conn.asyncFetch(this.path, this.conn.getConfig);
-        } catch (err) {
-            console.log("----> Status could not be fetched from: " + this.path);
-        }
+        return this.conn.asyncFetch(this.path, this.conn.getConfig);
     }
 
 }
