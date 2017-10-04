@@ -32,9 +32,9 @@ export class TaxiiConnect {
             'method': 'get',
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.taxii+json',
-                'version': '2.0',
+                'version': '2.1',
                 'Authorization': 'Basic ' + this.hash,
-                'Content-Type': 'application/vnd.oasis.taxii+json'
+                'Content-Type': 'application/vnd.oasis.taxii+json',
             })
         };
 
@@ -42,9 +42,9 @@ export class TaxiiConnect {
             'method': 'post',
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.taxii+json',
-                'version': '2.0',
+                'version': '2.1',
                 'Authorization': 'Basic ' + this.hash,
-                'Content-Type': 'application/vnd.oasis.stix+json'
+                'Content-Type': 'application/vnd.oasis.stix+json',
             })
         };
 
@@ -52,9 +52,10 @@ export class TaxiiConnect {
             'method': 'get',
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.stix+json',
-                'version': '2.0',
+                'version': '2.1',
                 'Authorization': 'Basic ' + this.hash,
                 'Content-Type': 'application/vnd.oasis.stix+json'
+
             })
         };
     }
@@ -400,7 +401,7 @@ export class Collection {
      * @returns {Promise} the Bundle with the STIX-2 objects of this collection
      */
     async getObjects(filter) {
-        return this.ifCanRead(this.conn.fetchThis(this.path + "objects/", this.objsOptions, filter, this.getStixConfig));
+        return this.ifCanRead(this.conn.fetchThis(this.path + "objects/", this.objsOptions, filter, this.conn.getStixConfig));
     }
 
     /**
@@ -411,7 +412,7 @@ export class Collection {
      * For example: {"version": "2016-01-01T01:01:01.000Z"}
      */
     async getObject(obj_id, filter) {
-        let result = await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter, this.getStixConfig).then(bundle => {
+        let result = await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter, this.conn.getStixConfig).then(bundle => {
             return bundle.objects.find(obj => obj.id === obj_id);
         }))));
         return result;
