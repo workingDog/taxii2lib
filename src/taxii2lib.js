@@ -1,4 +1,4 @@
-/* global encodeURIComponent, fetch, Promise */
+
 
 /**
  * @file
@@ -21,18 +21,19 @@ export class TaxiiConnect {
      * @param {String} user - the user name required for authentication.
      * @param {String} password - the user password required for authentication.
      */
-    constructor(url, user, password) {
+    constructor(url, user, password, timeout) {
         this.baseURL = TaxiiConnect.withoutLastSlash(url);
         this.user = user;
         this.password = password;
         this.hash = btoa(this.user + ":" + this.password);
+        this.timeout = timeout ? timeout : 5000; // default timeout
 
         // default configuration
         this.getConfig = {
             'method': 'get',
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.taxii+json',
-                'version': '2.1',
+                'version': '2.0',
                 'Authorization': 'Basic ' + this.hash,
                 'Content-Type': 'application/vnd.oasis.taxii+json'
             })
@@ -42,7 +43,7 @@ export class TaxiiConnect {
             'method': 'post',
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.taxii+json',
-                'version': '2.1',
+                'version': '2.0',
                 'Authorization': 'Basic ' + this.hash,
                 'Content-Type': 'application/vnd.oasis.stix+json'
             })
@@ -52,11 +53,12 @@ export class TaxiiConnect {
             'method': 'get',
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.stix+json',
-                'version': '2.1',
+                'version': '2.0',
                 'Authorization': 'Basic ' + this.hash,
                 'Content-Type': 'application/vnd.oasis.stix+json'
             })
         };
+
     }
 
     /**
@@ -77,10 +79,11 @@ export class TaxiiConnect {
         return results;
     }
 
-    async asyncFetch2(path, config, filter, timeout) {
+    // testing
+    async asyncFetch2(path, config, filter) {
         Promise.race([
             this.asyncFetch(path, config, filter),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), this.timeout))
         ]);
     }
 
