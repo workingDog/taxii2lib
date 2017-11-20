@@ -137,12 +137,10 @@ export class TaxiiConnect {
      * @returns {String} the query string corresponding to the filter object.
      */
     static asQueryString(filter) {
-        var esc = encodeURIComponent;
-        var query = Object.keys(filter).map(k => {
+        return Object.keys(filter).map(k => {
             let value = (k === "added_after") ? k : "match[" + k + "]";
-            return esc(value) + '=' + esc(filter[k]);
+            return encodeURIComponent(value) + '=' + encodeURIComponent(filter[k]);
         }).join('&');
-        return query;
     }
 }
 
