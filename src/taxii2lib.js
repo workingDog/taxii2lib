@@ -34,8 +34,7 @@ export class TaxiiConnect {
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.taxii+json',
                 'version': '2.0',
-                'Authorization': 'Basic ' + this.hash,
-                'Content-Type': 'application/vnd.oasis.taxii+json'
+                'Authorization': 'Basic ' + this.hash
             })
         };
 
@@ -43,9 +42,9 @@ export class TaxiiConnect {
             'method': 'post',
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.taxii+json',
+                'Content-Type': 'application/vnd.oasis.stix+json',
                 'version': '2.0',
-                'Authorization': 'Basic ' + this.hash,
-                'Content-Type': 'application/vnd.oasis.stix+json'
+                'Authorization': 'Basic ' + this.hash
             })
         };
 
@@ -54,8 +53,7 @@ export class TaxiiConnect {
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.stix+json',
                 'version': '2.0',
-                'Authorization': 'Basic ' + this.hash,
-                'Content-Type': 'application/vnd.oasis.stix+json'
+                'Authorization': 'Basic ' + this.hash
             })
         };
 
@@ -71,12 +69,11 @@ export class TaxiiConnect {
      */
     async asyncFetch(path, config, filter) {
         let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
-        let results = await (await (fetch(fullPath, config).then(res => {
+        await (await (fetch(fullPath, config).then(res => {
             return res.json();
         }).catch(err => {
             throw new Error("fetch error: " + err);
         })));
-        return results;
     }
 
     // testing
@@ -412,10 +409,9 @@ export class Collection {
      * For example: {"version": "2016-01-01T01:01:01.000Z"}
      */
     async getObject(obj_id, filter) {
-        let result = await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter, this.conn.getStixConfig).then(bundle => {
+        await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter, this.conn.getStixConfig).then(bundle => {
             return bundle.objects.find(obj => obj.id === obj_id);
         }))));
-        return result;
     }
 
     /**
