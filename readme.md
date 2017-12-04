@@ -26,12 +26,12 @@ The following TAXII 2.0 API services are supported with these corresponding asyn
 
 - Server Discovery --> server.discovery()
 - Get API Root Information --> server.api_roots()
-- Get Collections --> collections.get() and collections.get(i)
+- Get Collections --> collections.collections(range) and collections.get(i)
 - Get a Collection --> collection.get()
-- Get Objects --> collection.getObjects(filter)
+- Get Objects --> collection.getObjects(filter, range)
 - Add Objects --> collection.addObject(bundle)
 - Get an Object --> collection.getObject(obj_id, filter)
-- Get Object Manifests --> collection.getManifests(filter) and collection.getManifest(obj_id, filter)
+- Get Object Manifests --> collection.getManifests(filter, range) and collection.getManifest(obj_id, filter)
 - Get Status --> status.get()
 
 Example:
@@ -64,6 +64,11 @@ is of the form:
     {"added_after": "2016-02-01T00:00:01.000Z", "version": "2016-01-01T01:01:01.000Z"}
     {"type": "incident", "version": "2016-01-01T01:01:01.000Z"}
 
+Note the optional **range** object passed to the methods 
+collections.collections(range), collection.getObjects(filter, range) and
+collection.getManifests(filter, range) is a string of the form: 
+
+    "0-100"
  
 ### References
  

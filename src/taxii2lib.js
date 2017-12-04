@@ -1,5 +1,3 @@
-
-
 /**
  * @file
  * A TAXII 2.0 Javascript client library.
@@ -20,6 +18,7 @@ export class TaxiiConnect {
      * @param {String} url - the base url of the Taxii2 server, for example https://example.com/
      * @param {String} user - the user name required for authentication.
      * @param {String} password - the user password required for authentication.
+     * @param {Integer} timeout - the connection timeout in millisec
      */
     constructor(url, user, password, timeout) {
         this.baseURL = TaxiiConnect.withoutLastSlash(url);
@@ -28,12 +27,14 @@ export class TaxiiConnect {
         this.hash = btoa(this.user + ":" + this.password);
         this.timeout = timeout ? timeout : 5000; // default timeout
 
+        this.version = '2.0';
+
         // default configuration
         this.getConfig = {
             'method': 'get',
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.taxii+json',
-                'version': '2.0',
+                'version': this.version,
                 'Authorization': 'Basic ' + this.hash
             })
         };
@@ -43,7 +44,7 @@ export class TaxiiConnect {
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.taxii+json',
                 'Content-Type': 'application/vnd.oasis.stix+json',
-                'version': '2.0',
+                'version': this.version,
                 'Authorization': 'Basic ' + this.hash
             })
         };
@@ -52,7 +53,7 @@ export class TaxiiConnect {
             'method': 'get',
             'headers': new Headers({
                 'Accept': 'application/vnd.oasis.stix+json',
-                'version': '2.0',
+                'version': this.version,
                 'Authorization': 'Basic ' + this.hash
             })
         };
@@ -74,14 +75,6 @@ export class TaxiiConnect {
         }).catch(err => {
             throw new Error("fetch error: " + err);
         })));
-    }
-
-    // testing
-    async asyncFetch2(path, config, filter) {
-        Promise.race([
-            this.asyncFetch(path, config, filter),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), this.timeout))
-        ]);
     }
 
     /**
@@ -280,41 +273,56 @@ export class Collections {
     }
 
     /**
-     * provide information about the Collections hosted under this API Root.
-     *
-     * If no argument is provided get(), this method returns the list of collection objects.
-     * If an index integer is provided, this method returns a specific collection into the collections list.
+     * provide information about a specific Collection hosted under this API Root.
      *
      * @param {Integer} index - the index of the desired collection object.
-     * @returns {Array|Object} an array of collection objects, or a specific collection object.
+     * @returns {Object} a specific collection object.
      */
     async get(index) {
-        if (typeof index === "undefined") {
-            // return a list of collection info
-            await this.conn.fetchThis(this.api_root_path + "collections/", this.options);
-            return this.options.cache.collections;
-        } else {
-            if (Number.isInteger(index) && index >= 0) {
-                // return a specific collection info
-                if (!this.collectionsFlag) {
-                    return this.get().then(cols => {
-                        if (index < this.options.cache.collections.length) {
-                            return this.options.cache.collections[index];
-                        } else {
-                            console.log("----> in Collections get(index) invalid index value: " + index);
-                        }
-                    });
-                } else {
+        if (Number.isInteger(index) && index >= 0) {
+            // return a specific collection info
+            if (!this.collectionsFlag) {
+                return this.collections().then(cols => {
                     if (index < this.options.cache.collections.length) {
                         return this.options.cache.collections[index];
                     } else {
                         console.log("----> in Collections get(index) invalid index value: " + index);
                     }
-                }
+                });
             } else {
-                console.log("----> in Collections get(index) invalid index value: " + index);
+                if (index < this.options.cache.collections.length) {
+                    return this.options.cache.collections[index];
+                } else {
+                    console.log("----> in Collections get(index) invalid index value: " + index);
+                }
             }
+        } else {
+            console.log("----> in Collections get(index) invalid index value: " + index);
         }
+    }
+
+    /**
+     * provide information about the Collections hosted under this API Root.
+     *
+     * @param {String} range - a pagination range string, for example "0-10"
+     * @returns {Array} an array of collection objects
+     */
+    async collections(range) {
+        var theConfig = this.conn.getConfig;
+        if (range !== undefined) {
+            theConfig = {
+                'method': 'get',
+                'headers': new Headers({
+                    'Accept': 'application/vnd.oasis.taxii+json',
+                    'version': this.conn.version,
+                    'Authorization': 'Basic ' + this.hash,
+                    'Range': 'items=' + range
+                })
+            };
+        }
+        // return a list of collection info
+        await this.conn.fetchThis(this.api_root_path + "collections/", this.options, "", theConfig);
+        return this.options.cache.collections;
     }
 
 }
@@ -394,11 +402,24 @@ export class Collection {
      *
      * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string.
      * For example: {"added_after": "2016-02-01T00:00:01.000Z"}
-     *          {"type": ["incident","ttp","actor"]}
+     *              {"type": ["incident","ttp","actor"]}
+     * @param {String} range - a pagination range string, for example "0-10"
      * @returns {Promise} the Bundle with the STIX-2 objects of this collection
      */
-    async getObjects(filter) {
-        return this.ifCanRead(this.conn.fetchThis(this.path + "objects/", this.objsOptions, filter, this.conn.getStixConfig));
+    async getObjects(filter, range) {
+        var theConfig = this.conn.getStixConfig;
+        if (range !== undefined) {
+            theConfig = {
+                'method': 'get',
+                'headers': new Headers({
+                    'Accept': 'application/vnd.oasis.stix+json',
+                    'version': this.conn.version,
+                    'Authorization': 'Basic ' + this.hash,
+                    'Range': 'items=' + range
+                })
+            };
+        }
+        return this.ifCanRead(this.conn.fetchThis(this.path + "objects/", this.objsOptions, filter, theConfig));
     }
 
     /**
@@ -428,10 +449,23 @@ export class Collection {
      * Manifests are metadata about the objects.
      *
      * @param {Object} filter - the filter object describing the filtering requested, this is added to the path as a query string.
+     * @param {String} range - a pagination range string, for example "0-10"
      * @return {Array} an array of manifest entries object
      */
-    async getManifests(filter) {
-        this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions, filter));
+    async getManifests(filter, range) {
+        var theConfig = this.conn.getConfig;
+        if (range !== undefined) {
+            theConfig = {
+                'method': 'get',
+                'headers': new Headers({
+                    'Accept': 'application/vnd.oasis.taxii+json',
+                    'version': this.conn.version,
+                    'Authorization': 'Basic ' + this.hash,
+                    'Range': 'items=' + range
+                })
+            };
+        }
+        this.ifCanRead(await this.conn.fetchThis(this.path + "manifest/", this.manOptions, filter, theConfig));
         return this.manOptions.cache.objects;
     }
 
