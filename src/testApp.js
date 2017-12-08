@@ -18,6 +18,9 @@ const testCollectionInfo = {
     "media_types": ["application/vnd.oasis.stix+json"]
 };
 
+// curl --verbose -H "Accept:application/vnd.oasis.taxii+json;version=2.0;" https://test.freetaxii.com:8000/taxii/
+
+
 // ----------------------------------------------------------------------------------------
 
 // the url should be without the last slash, if present the url will be used without it internally.
@@ -28,19 +31,20 @@ const conn = new TaxiiConnect("https://test.freetaxii.com:8000", "user-me", "use
 const server = new Server("/taxii/", conn);
 
 server.discovery().then(discovery => {
-    console.log("----> Server discovery \n" + JSON.stringify(discovery));
-    console.log("----> Server discovery.title \n" + discovery.title);
+    console.log("----> A Server discovery \n" + JSON.stringify(discovery));
+
+   // console.log("----> Server discovery.title \n" + discovery.title);
     // get the api roots url
-    discovery.api_roots.map(apiroot => {
-        console.log("----> Server discovery.api_roots apiroot \n" + JSON.stringify(apiroot));
-        // create a collection (endpoint) given an api root url
-        const theCollection = new Collection(testCollectionInfo, apiroot, conn);
-        console.log("----> Server theCollection apiroot = " + apiroot);
-        // fetch this particular collection info
-        theCollection.get().then(info => {
-            console.log("----> Server theCollection.get() \n" + JSON.stringify(info));
-        });
-    });
+    // discovery.api_roots.map(apiroot => {
+    //     console.log("----> Server discovery.api_roots apiroot \n" + JSON.stringify(apiroot));
+    //     // create a collection (endpoint) given an api root url
+    //     const theCollection = new Collection(testCollectionInfo, apiroot, conn);
+    //     console.log("----> Server theCollection apiroot = " + apiroot);
+    //     // fetch this particular collection info
+    //     theCollection.get().then(info => {
+    //         console.log("----> Server theCollection.get() \n" + JSON.stringify(info));
+    //     });
+    // });
 });
 
 // returns all api roots that could be retrieved (not those with a could not connect or had an error)

@@ -62,6 +62,23 @@ export class TaxiiConnect {
 
     }
 
+    // original code from: https://github.com/jkomyno/fetch-timeout
+    timeoutPromise(promise, timeout, error) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                reject(error);
+            }, timeout);
+            promise.then(resolve, reject);
+        });
+    }
+    // original code from: https://github.com/jkomyno/fetch-timeout
+    fetchTimeout(url, options, timeout, error) {
+        error = error || 'Timeout error';
+        options = options || {};
+        timeout = timeout || 10000;
+        return this.timeoutPromise(fetch(url, options), timeout, error);
+    }
+
     /**
      * send an async request (GET or POST) to the taxii2 server.
      *
@@ -72,7 +89,24 @@ export class TaxiiConnect {
      */
     async asyncFetch(path, config, filter) {
         let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
-        await (await (fetch(fullPath, config).then(res => {
+        // todo to be removed --> for testing, a CORS proxy to bypass the Access-Control-Allow-Origin response header
+        let tempPath = "https://cors-anywhere.herokuapp.com/" + fullPath;
+        return await (await (
+            this.fetchTimeout(tempPath, config, this.timeout, 'connection timeout')
+                .then(res => {
+                    return res.json();
+                })
+                .catch(err => {
+                    throw new Error("fetch error: " + err);
+                })));
+    }
+
+    // without timeout
+    async asyncFetchxx(path, config, filter) {
+        let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
+        // todo to be removed --> for testing, a CORS proxy to bypass the Access-Control-Allow-Origin response header
+        let tempPath = "https://cors-anywhere.herokuapp.com/" + fullPath;
+        return await (await (fetch(tempPath, config).then(res => {
             return res.json();
         }).catch(err => {
             throw new Error("fetch error: " + err);
@@ -432,7 +466,7 @@ export class Collection {
      * For example: {"version": "2016-01-01T01:01:01.000Z"}
      */
     async getObject(obj_id, filter) {
-        await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter, this.conn.getStixConfig).then(bundle => {
+        return await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter, this.conn.getStixConfig).then(bundle => {
             return bundle.objects.find(obj => obj.id === obj_id);
         }))));
     }
