@@ -10,6 +10,8 @@
 
 /**
  * Provide asynchronous network communications to a TAXII 2.0 server.
+ *
+ * todo timeout
  */
 export class TaxiiConnect {
 
