@@ -1,5 +1,5 @@
-
 import {TaxiiConnect, Server, Collections, Collection, Status} from './taxii2lib.js';
+
 console.log("---> in testApp.js <---");
 
 const testBundle = {
@@ -10,7 +10,7 @@ const testBundle = {
 };
 
 const testCollectionInfo = {
-    "id": "9cfa669c-ee94-4ece-afd2-f8edac37d8fd",
+    "id": "34f8c42d-213a-480d-9046-0bd8a8f25680",
     "title": "Emerging Threats - Block Rules - Compromised IPs",
     "description": "A collection of blocking rule indicators from Emerging Threats. Pulled live from: https://rules.emergingthreats.net/blockrules/emerging-botcc.excluded",
     "can_read": true,
@@ -23,8 +23,11 @@ const testCollectionInfo = {
 
 // ----------------------------------------------------------------------------------------
 
+// a CORS proxy to bypass the Access-Control-Allow-Origin response header
+let corsPath = "https://cors-anywhere.herokuapp.com/" + "https://test.freetaxii.com:8000";
+
 // the url should be without the last slash, if present the url will be used without it internally.
-const conn = new TaxiiConnect("https://test.freetaxii.com:8000", "user-me", "user-password");
+const conn = new TaxiiConnect(corsPath, "user-me", "user-password");
 // ----------------------------------------------------------------------------------------
 
 // make sure the path starts and ends with a "/"
@@ -33,7 +36,7 @@ const server = new Server("/taxii/", conn);
 server.discovery().then(discovery => {
     console.log("----> A Server discovery \n" + JSON.stringify(discovery));
 
-   // console.log("----> Server discovery.title \n" + discovery.title);
+    // console.log("----> Server discovery.title \n" + discovery.title);
     // get the api roots url
     // discovery.api_roots.map(apiroot => {
     //     console.log("----> Server discovery.api_roots apiroot \n" + JSON.stringify(apiroot));
@@ -65,17 +68,18 @@ server.discovery().then(discovery => {
 
 // ----------------------------------------------------------------------------------------
 
-// const theCollection = new Collection(testCollectionInfo, "https://test.freetaxii.com:8000/api1/", conn);
-//
-// theCollection.get().then(info => {
-//     console.log("----> theCollection.get() \n" + JSON.stringify(info));
-// });
-//
-// theCollection.getObjects().then(bundle => {
-//     console.log("----> theCollection.getObjects() \n" + JSON.stringify(bundle));
-// });
-//
-// theCollection.getObjects({"type": ["incident", "ttp", "actor"]}).then(bundle => {
+const theCollection = new Collection(testCollectionInfo, corsPath+"/osint/", conn);
+
+theCollection.get().then(info => {
+    console.log("----> theCollection.get() \n" + JSON.stringify(info));
+});
+
+theCollection.getObjects().then(bundle => {
+    console.log("----> theCollection.getObjects() \n" + JSON.stringify(bundle));
+});
+
+// {"type": ["incident", "ttp", "actor"]}
+// theCollection.getObjects({"type": ["indicator"]}).then(bundle => {
 //     console.log("+++++> theCollection.getObjects(filter1) \n" + JSON.stringify(bundle.objects[0]));
 // });
 //

@@ -11,7 +11,6 @@
 /**
  * Provide asynchronous network communications to a TAXII 2.0 server.
  *
- * todo timeout
  */
 export class TaxiiConnect {
 
@@ -27,7 +26,7 @@ export class TaxiiConnect {
         this.user = user;
         this.password = password;
         this.hash = btoa(this.user + ":" + this.password);
-        this.timeout = timeout ? timeout : 5000; // default timeout
+        this.timeout = timeout ? timeout : 10000; // default timeout
 
         this.version = '2.0';
 
@@ -89,10 +88,8 @@ export class TaxiiConnect {
      */
     async asyncFetch(path, config, filter) {
         let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
-        // todo to be removed --> for testing, a CORS proxy to bypass the Access-Control-Allow-Origin response header
-        let tempPath = "https://cors-anywhere.herokuapp.com/" + fullPath;
         return await (await (
-            this.fetchTimeout(tempPath, config, this.timeout, 'connection timeout')
+            this.fetchTimeout(fullPath, config, this.timeout, 'connection timeout')
                 .then(res => {
                     return res.json();
                 })
@@ -102,16 +99,14 @@ export class TaxiiConnect {
     }
 
     // without timeout
-    async asyncFetchxx(path, config, filter) {
-        let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
-        // todo to be removed --> for testing, a CORS proxy to bypass the Access-Control-Allow-Origin response header
-        let tempPath = "https://cors-anywhere.herokuapp.com/" + fullPath;
-        return await (await (fetch(tempPath, config).then(res => {
-            return res.json();
-        }).catch(err => {
-            throw new Error("fetch error: " + err);
-        })));
-    }
+    // async asyncFetchxx(path, config, filter) {
+    //     let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
+    //     return await (await (fetch(fullPath, config).then(res => {
+    //         return res.json();
+    //     }).catch(err => {
+    //         throw new Error("fetch error: " + err);
+    //     })));
+    // }
 
     /**
      * send a GET async request to the taxii2 server.
