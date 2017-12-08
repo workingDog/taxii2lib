@@ -59,7 +59,7 @@ Note the optional **filter** object passed to the methods collection.getObjects(
 collection.getObject(obj_id, filter), collection.getManifests(filter) and collection.getManifest(obj_id, filter) 
 is of the form:
 
-    {"type": ["incident","ttp","actor"]}
+    {"type": "incident,ttp,actor"}
     {"id": "indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb"}
     {"added_after": "2016-02-01T00:00:01.000Z", "version": "2016-01-01T01:01:01.000Z"}
     {"type": "incident", "version": "2016-01-01T01:01:01.000Z"}

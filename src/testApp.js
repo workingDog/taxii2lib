@@ -74,15 +74,15 @@ theCollection.get().then(info => {
     console.log("----> theCollection.get() \n" + JSON.stringify(info));
 });
 
-theCollection.getObjects().then(bundle => {
-    console.log("----> theCollection.getObjects() \n" + JSON.stringify(bundle));
+// theCollection.getObjects().then(bundle => {
+//     console.log("----> theCollection.getObjects() \n" + JSON.stringify(bundle));
+// });
+
+// {"type": "incident,ttp,actor,sighting"}
+theCollection.getObjects({"type": "indicator"}).then(bundle => {
+    console.log("+++++> theCollection.getObjects(filter, range) \n" + JSON.stringify(bundle));
 });
 
-// {"type": ["incident", "ttp", "actor"]}
-// theCollection.getObjects({"type": ["indicator"]}).then(bundle => {
-//     console.log("+++++> theCollection.getObjects(filter1) \n" + JSON.stringify(bundle.objects[0]));
-// });
-//
 // theCollection.getObjects({"id": "indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb"}).then(bundle => {
 //    console.log("+++++> theCollection.getObjects(filter2) \n" + JSON.stringify(bundle.objects[0]));
 // });
