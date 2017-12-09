@@ -76,4 +76,4 @@ collection.getManifests(filter, range) is a string of the form:
  
 
 ### Status
-not finished, not tested.
+work in progress, not tested.
