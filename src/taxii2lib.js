@@ -30,7 +30,7 @@ export class TaxiiConnect {
 
         this.version = '2.0';
 
-        // default configuration
+        // default headers configurations
         this.getConfig = {
             'method': 'get',
             'headers': new Headers({
@@ -64,9 +64,7 @@ export class TaxiiConnect {
     // original code from: https://github.com/jkomyno/fetch-timeout
     timeoutPromise(promise, timeout, error) {
         return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                reject(error);
-            }, timeout);
+            setTimeout(() => reject(error), timeout);
             promise.then(resolve, reject);
         });
     }
@@ -90,23 +88,9 @@ export class TaxiiConnect {
         let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
         return await (await (
             this.fetchTimeout(fullPath, config, this.timeout, 'connection timeout')
-                .then(res => {
-                    return res.json();
-                })
-                .catch(err => {
-                    throw new Error("fetch error: " + err);
-                })));
+                .then(res => res.json())
+                .catch(err => { throw new Error("fetch error: " + err); } ) ));
     }
-
-    // without timeout
-    // async asyncFetchxx(path, config, filter) {
-    //     let fullPath = (filter === undefined) ? path : path + "?" + TaxiiConnect.asQueryString(filter);
-    //     return await (await (fetch(fullPath, config).then(res => {
-    //         return res.json();
-    //     }).catch(err => {
-    //         throw new Error("fetch error: " + err);
-    //     })));
-    // }
 
     /**
      * send a GET async request to the taxii2 server.
@@ -128,10 +112,8 @@ export class TaxiiConnect {
         if (!options.flag) {
             options.cache = await (this.asyncFetch(path, conf, filter));
             options.flag = true;
-            return options.cache;
-        } else {
-            return options.cache;
         }
+        return options.cache;
     }
 
     /**
@@ -219,9 +201,7 @@ export class Server {
      * @returns {Promise} the Array of api roots information objects
      */
     async api_roots() {
-        return this.discovery().then(discovery => {
-            return this._getApiRoots(discovery);
-        });
+        return this.discovery().then(discovery => this._getApiRoots(discovery));
     }
 
     /**
@@ -233,9 +213,7 @@ export class Server {
      */
     async api_rootsMap() {
         var apiRootMap = new Map();
-        await this.discovery().then(discovery => {
-            return this._getApiRoots(discovery, apiRootMap);
-        });
+        await this.discovery().then(discovery => this._getApiRoots(discovery, apiRootMap));
         return apiRootMap;
     }
 
@@ -260,14 +238,10 @@ export class Server {
                 this.apiOptions.cache.push(apiroot);
             }));
             // remove the undefined and empty elements, that is those we could not connect to.
-            this.apiOptions.cache = this.apiOptions.cache.filter(element => {
-                return (element !== undefined && !Server.isEmpty(element));
-            });
+            this.apiOptions.cache = this.apiOptions.cache.filter(element => (element !== undefined && !Server.isEmpty(element)));
             this.apiOptions.flag = true;
-            return this.apiOptions.cache;
-        } else {
-            return this.apiOptions.cache;
         }
+        return this.apiOptions.cache;
     }
 
 }
@@ -461,9 +435,8 @@ export class Collection {
      * For example: {"version": "2016-01-01T01:01:01.000Z"}
      */
     async getObject(obj_id, filter) {
-        return await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter, this.conn.getStixConfig).then(bundle => {
-            return bundle.objects.find(obj => obj.id === obj_id);
-        }))));
+        return await (await (this.ifCanRead(this.conn.fetchThis(this.path + "objects/" + obj_id + "/", this.objOptions, filter, this.conn.getStixConfig)
+        .then(bundle => bundle.objects.find(obj => obj.id === obj_id) ))));
     }
 
     /**
@@ -509,9 +482,7 @@ export class Collection {
      * @return {Object} a manifest entry of the desired STIX-2 object.
      */
     async getManifest(obj_id, filter) {
-        return await (this.getManifests(filter).then(objects => {
-            return objects.find(obj => obj.id === obj_id);
-        }));
+        return await (this.getManifests(filter).then(objects => objects.find(obj => obj.id === obj_id)));
     }
 
 }

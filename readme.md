@@ -41,15 +41,11 @@ Example:
     // create a server endpoint
     const server = new Server("/taxii/", conn);
     // fetch the discovery info from the server 
-    server.discovery().then(discovery => {
-        console.log("----> Server discovery \n" + JSON.stringify(discovery));
-    });
+    server.discovery().then(discovery => console.log("----> Server discovery \n" + JSON.stringify(discovery)) );
     // fetch the api roots info from the server
     server.api_roots().then(apiroots => {
         console.log("----> Server apiroots \n" + JSON.stringify(apiroots));
-        apiroots.map(apiroot => {
-            console.log("----> Server apiroots apiroot \n" + JSON.stringify(apiroot));
-        });
+        apiroots.map(apiroot => console.log("----> Server apiroots apiroot \n" + JSON.stringify(apiroot)) );
     });
 
 See the [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/) for the list 
@@ -76,4 +72,4 @@ collection.getManifests(filter, range) is a string of the form:
  
 
 ### Status
-work in progress, not tested.
+work in progress, not fully tested.

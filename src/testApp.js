@@ -78,7 +78,7 @@ theCollection.get().then(info => {
 //     console.log("----> theCollection.getObjects() \n" + JSON.stringify(bundle));
 // });
 
-// {"type": "incident,ttp,actor,sighting"}
+// {"type": "indicator,sighting"}
 theCollection.getObjects({"type": "indicator"}).then(bundle => {
     console.log("+++++> theCollection.getObjects(filter, range) \n" + JSON.stringify(bundle));
 });
