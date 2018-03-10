@@ -2,13 +2,6 @@ import {TaxiiConnect, Server, Collections, Collection, Status} from './taxii2lib
 
 console.log("---> in testApp.js <---");
 
-const testBundle = {
-    "type": "bundle",
-    "id": "bundle-1",
-    "spec_version": "2.0",
-    "objects": []
-};
-
 const testCollectionInfo = {
     "id": "34f8c42d-213a-480d-9046-0bd8a8f25680",
     "title": "Emerging Threats - Block Rules - Compromised IPs",
@@ -18,126 +11,31 @@ const testCollectionInfo = {
     "media_types": ["application/vnd.oasis.stix+json"]
 };
 
-// curl --verbose -H "Accept:application/vnd.oasis.taxii+json;version=2.0;" https://test.freetaxii.com:8000/taxii/
+// the path to a taxii server
+let taxiiPath = "https://test.freetaxii.com:8000";
 
+// the CORS proxy to bypass the needed Access-Control-Allow-Origin response header from freetaxii
+let corsPath = "https://cors-anywhere.herokuapp.com/" + taxiiPath;
 
-// ----------------------------------------------------------------------------------------
+// the connection
+const conn = new TaxiiConnect(corsPath, "guest", "guest");
 
-// a CORS proxy to bypass the Access-Control-Allow-Origin response header
-let corsPath = "https://cors-anywhere.herokuapp.com/" + "https://test.freetaxii.com:8000";
-
-// the url should be without the last slash, if present the url will be used without it internally.
-const conn = new TaxiiConnect(corsPath, "user-me", "user-password");
-// ----------------------------------------------------------------------------------------
-
-// make sure the path starts and ends with a "/"
-const server = new Server("/taxii/", conn);
-
-server.discovery().then(discovery => {
-    console.log("----> A Server discovery \n" + JSON.stringify(discovery));
-
-    // console.log("----> Server discovery.title \n" + discovery.title);
-    // get the api roots url
-    // discovery.api_roots.map(apiroot => {
-    //     console.log("----> Server discovery.api_roots apiroot \n" + JSON.stringify(apiroot));
-    //     // create a collection (endpoint) given an api root url
-    //     const theCollection = new Collection(testCollectionInfo, apiroot, conn);
-    //     console.log("----> Server theCollection apiroot = " + apiroot);
-    //     // fetch this particular collection info
-    //     theCollection.get().then(info => {
-    //         console.log("----> Server theCollection.get() \n" + JSON.stringify(info));
-    //     });
-    // });
-});
-
-// returns all api roots that could be retrieved (not those with a could not connect or had an error)
-// server.api_roots().then(apiroots => {
-//     console.log("----> Server apiroots \n" + JSON.stringify(apiroots));
-//     apiroots.map(apiroot => {
-//         console.log("----> Server apiroots apiroot \n" + JSON.stringify(apiroot));
-//     });
-// });
-
-// returns a map of key=url value=api root.
-// so we can test if the url had a valid api root object or is undefined.
-// server.api_rootsMap().then(theMap => {
-//     for (let [key, value] of theMap.entries()) {
-//         console.log("----> Server api_rootsMap theMap \n   key = " + key + " \n   value = " + JSON.stringify(value));
-//     }
-// });
-
-// ----------------------------------------------------------------------------------------
-
+// setup the collection we want
 const theCollection = new Collection(testCollectionInfo, corsPath+"/osint/", conn);
 
-theCollection.get().then(info => {
-    console.log("----> theCollection.get() \n" + JSON.stringify(info));
+// get the collection information
+theCollection.get().then(info => console.log("----> the collection info \n" + JSON.stringify(info)) );
+
+// get the collection objects
+theCollection.getObjects().then(bundle => {
+    // the stix objects received in a bundle
+    console.log("-----> the collection bundle \n" + JSON.stringify(bundle));
+    // print all stix objects of the collection
+    for (let stix of bundle.objects) console.log("-----> stix: " + JSON.stringify(stix));
+    // print only the indicator objects
+    for (let stix of bundle.objects) {
+        if(stix.type == "indicator") console.log("=====> indicator stix: " + JSON.stringify(stix));
+    }
 });
 
-// theCollection.getObjects().then(bundle => {
-//     console.log("----> theCollection.getObjects() \n" + JSON.stringify(bundle));
-// });
-
-// {"type": "indicator,sighting"}
-theCollection.getObjects({"type": "indicator"}).then(bundle => {
-    console.log("+++++> theCollection.getObjects(filter, range) \n" + JSON.stringify(bundle));
-});
-
-// theCollection.getObjects({"id": "indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb"}).then(bundle => {
-//    console.log("+++++> theCollection.getObjects(filter2) \n" + JSON.stringify(bundle.objects[0]));
-// });
-//
-// theCollection.getObjects({"added_after": "2016-02-01T00:00:01.000Z", "version": "2016-01-01T01:01:01.000Z"}).then(bundle => {
-//     console.log("+++++> theCollection.getObjects(filter3) \n" + JSON.stringify(bundle.objects[0]));
-// });
-//
-// theCollection.getObjects({"type": "incident", "version": "2016-01-01T01:01:01.000Z"}).then(bundle => {
-//     console.log("+++++> theCollection.getObjects(filter4) \n" + JSON.stringify(bundle.objects[0]));
-// });
-//
-// theCollection.getObject("indicator--09303e92-608b-4b19-b453-109b170f17d3").then(stix => {
-//    console.log("----> theCollection.getObject(id) \n" + JSON.stringify(stix));
-// });
-
-//theCollection.addObject(testBundle).then(status => {
-//    console.log("---->  theCollection.addObject() \n" + JSON.stringify(status));
-//});
-
-//theCollection.getManifests().then(objList => {
-//    console.log("----> theCollection.getManifest() \n" + JSON.stringify(objList));
-//    objList.map(entry => {
-//        console.log("----> theCollection manifest entry \n" + JSON.stringify(entry));
-//    });
-//    console.log("----> theCollection manifest objList[0] \n" + JSON.stringify(objList[0]));
-//});
-//
-//theCollection.getManifest("indicator--ef0b28e1-308c-4a30-8770-9b4851b260a5").then(entry => {
-//    console.log("----> theCollection.getManifestEntry() \n" + JSON.stringify(entry));
-//});
-
-// ----------------------------------------------------------------------------------------
-
-// const theCollections = new Collections("https://test.freetaxii.com:8000/api1/", conn);
-//
-// theCollections.get().then(collections => {
-//     console.log("----> collections \n" + JSON.stringify(collections));
-//     collections.map(collection => {
-//         console.log("----> collections collection \n" + JSON.stringify(collection));
-//     });
-//     console.log("----> collections[0] \n" + JSON.stringify(collections[0]));
-// });
-//
-// theCollections.get(0).then(collection => {
-//     console.log("----> theCollections.get(0) \n" + JSON.stringify(collection));
-// });
-
-// ----------------------------------------------------------------------------------------
-//
-//const theStatus = new Status("https://example.com/api1", "2d086da7-4bdc-4f91-900e-d77486753710", conn);
-//
-//theStatus.get().then(status => {
-//    console.log("----> theStatus.get() \n" + JSON.stringify(status));
-//});
-
-// ----------------------------------------------------------------------------------------
 
