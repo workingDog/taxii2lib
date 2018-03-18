@@ -48,6 +48,8 @@ Example:
         apiroots.map(apiroot => console.log("----> Server apiroots apiroot \n" + JSON.stringify(apiroot)) );
     });
 
+See also the **testApp.js**.
+
 See the [TAXII 2.0 Specification](https://oasis-open.github.io/cti-documentation/) for the list 
 of attributes of the TAXII 2.0 server responses.
 

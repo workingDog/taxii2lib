@@ -24,7 +24,8 @@ const conn = new TaxiiConnect(corsPath, "guest", "guest");
 const theCollection = new Collection(testCollectionInfo, corsPath+"/osint/", conn);
 
 // get the collection information
-theCollection.get().then(info => console.log("----> the collection info \n" + JSON.stringify(info)) );
+theCollection.get().then(info => console.log("----> the collection info \n" + JSON.stringify(info)))
+        .catch(err => { console.log("-----> get() error: " + err); } );
 
 // get the collection objects
 theCollection.getObjects().then(bundle => {
@@ -36,6 +37,14 @@ theCollection.getObjects().then(bundle => {
     for (let stix of bundle.objects) {
         if(stix.type == "indicator") console.log("=====> indicator stix: " + JSON.stringify(stix));
     }
-});
+}).catch(err => { console.log("-----> getObjects() error: " + err); } );
+
+// get the collection objects with a filter
+theCollection.getObjects({"type": "indicator"}).then(bundle => {
+    // print all stix objects returned
+    for (let stix of bundle.objects) console.log("++++++> stix: " + JSON.stringify(stix));
+}).catch(err => { console.log("-----> getObjects(filter) error: " + err); } );
+
+
 
 
