@@ -37,7 +37,7 @@ The following TAXII 2.0 API services are supported with these corresponding asyn
 Example:
 
     // create the communication instance
-    const conn = new TaxiiConnect("https://test.freetaxii.com:8000", "user-me", "my-password");
+    const conn = new TaxiiConnect("https://limo.anomali.com/api/v1/taxii2", "guest", "guest");
     // create a server endpoint
     const server = new Server("/taxii/", conn);
     // fetch the discovery info from the server 
